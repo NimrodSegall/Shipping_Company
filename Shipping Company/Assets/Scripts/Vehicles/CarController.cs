@@ -4,11 +4,18 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    public float carLength = 1f;
+
+    private int carLayerMask = 1 << 8;
+
     [SerializeField]
-    private float speed = 7f;
+    private float baseSpeed = 7f;
 
     [SerializeField]
     private float lifeTime = 20f;
+
+    [SerializeField]
+    private float detectionDistance = 10f;
 
     private Rigidbody rb = null;
 
@@ -17,9 +24,15 @@ public class CarController : MonoBehaviour
     [SerializeField]
     private LaneConnection nextNode = null;
 
+    private Rigidbody carInfrontRb = null;
+    private float newSpeed = 0f;
+    private float stoppingDistance = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
+        baseSpeed = Random.Range(4f, 10f);
+        newSpeed = baseSpeed;
         rb = GetComponent<Rigidbody>();
         Destroy(gameObject, lifeTime);
     }
@@ -34,12 +47,23 @@ public class CarController : MonoBehaviour
             {
                 transform.LookAt(nextNode.transform);
             }
-            rb.velocity = speed * transform.forward;
-            if(ReachedNextNode())
+            rb.velocity = newSpeed * transform.forward;
+            if (ReachedNextNode())
             {
                 currentNode = nextNode.next;
             }
         }
+
+        GetCarInfront();
+        if(carInfrontRb != null)
+        {
+            ChangeVelocityToAvoidCollision();
+        }
+        else
+        {
+            newSpeed = baseSpeed;
+        }
+
     }
 
     public void SetStartingNode(LaneConnection startingNode)
@@ -51,5 +75,24 @@ public class CarController : MonoBehaviour
     {
         float distance = (transform.position - nextNode.transform.position).magnitude;
         return distance < 0.1f;
+    }
+
+    private void ChangeVelocityToAvoidCollision()
+    {
+        float distance = (transform.position - carInfrontRb.transform.position).magnitude - (carLength / 2);
+        newSpeed = baseSpeed * ((distance - stoppingDistance) / detectionDistance);
+    }
+
+    private void GetCarInfront()
+    {
+        Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, detectionDistance, carLayerMask, QueryTriggerInteraction.Collide);
+        if(hitInfo.collider != null)
+        {
+            carInfrontRb = hitInfo.collider.GetComponent<Rigidbody>();
+        }
+        else
+        {
+            carInfrontRb = null;
+        }
     }
 }
