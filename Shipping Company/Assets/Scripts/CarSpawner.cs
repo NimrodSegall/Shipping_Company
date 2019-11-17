@@ -16,10 +16,9 @@ public class CarSpawner : MonoBehaviour
     [SerializeField]
     private GameObject[] cars = null;
 
-    public GameObject spawnPointObject = null;
+    public RoadNode spawnNode = null;
 
-    private IEnumerator delayCoroutine;
-    private float delay = 0.01f;
+    private int nodeLayerMask = 1 << 9;
 
     private float spawnDelay = 1;
     private float lastSpawnTime = 0;
@@ -29,40 +28,27 @@ public class CarSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        delayCoroutine = DelayBeforeStart(delay);
-        StartCoroutine(delayCoroutine);
+        if(spawnNode == null)
+        {
+            spawnNode = FindSpawnNode();
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        
-        if(allowUpdate)
-        {
-            StopCoroutine(delayCoroutine);
-            SpawnCars();
-        }
-            
+        SpawnCars();
     }
 
-    private IEnumerator DelayBeforeStart(float delay)
+    private RoadNode FindSpawnNode()
     {
-        yield return new WaitForSeconds(delay);
-        spawnPointObject = FindEmptyConnection();
-        allowUpdate = true;
-    }
-
-    private GameObject FindEmptyConnection()
-    {
-        Collider[] collidersInRadius = Physics.OverlapSphere(transform.position, searchRadius);
+        Collider[] collidersInRadius = Physics.OverlapSphere(transform.position, searchRadius, nodeLayerMask);
         foreach (Collider col in collidersInRadius)
         {
-            if (col.CompareTag("laneConnection"))
+            RoadNode node = col.GetComponentInParent<RoadNode>();
+            if (node.prevs[0] == null)
             {
-                if (col.GetComponentInParent<Lane>().back.prev == null)
-                {
-                    return col.gameObject;
-                }
+                return node;
             }
         }
         return null;
@@ -75,8 +61,8 @@ public class CarSpawner : MonoBehaviour
             int carChoice = Random.Range(0, cars.Length);
             spawnDelay = NewSpawnDelay();
             lastSpawnTime = Time.time;
-            GameObject newCar = Instantiate(cars[carChoice], spawnPointObject.transform.position, Quaternion.identity);
-            newCar.GetComponent<CarController>().SetStartingNode(spawnPointObject.GetComponent<LaneConnection>());
+            GameObject newCar = Instantiate(cars[carChoice], spawnNode.transform.position, Quaternion.identity);
+            newCar.GetComponent<CarController>().SetStartingNode(spawnNode);
         }
         
         

@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    //public static int turnSeed = (int)Random.Range(0, 2147483647);  //Number between [0, INT_MAX)
+    public int turnID = 0;
     public float carLength = 1f;
 
     private int carLayerMask = 1 << 8;
@@ -12,7 +14,7 @@ public class CarController : MonoBehaviour
     private float baseSpeed = 7f;
 
     [SerializeField]
-    private float lifeTime = 20f;
+    private float lifeTime = 1000f;
 
     [SerializeField]
     private float detectionDistance = 10f;
@@ -20,79 +22,151 @@ public class CarController : MonoBehaviour
     private Rigidbody rb = null;
 
     [SerializeField]
-    private LaneConnection currentNode = null;
+    private RoadNode currentNode = null;
     [SerializeField]
-    private LaneConnection nextNode = null;
+    private RoadNode nextNode = null;
 
-    private Rigidbody carInfrontRb = null;
     private float newSpeed = 0f;
     private float stoppingDistance = 0f;
+
+    private float rechedNodeDistance = 0.5f;
+
+    private CarControllerData controllerData = null;
 
     // Start is called before the first frame update
     void Start()
     {
-        baseSpeed = Random.Range(4f, 10f);
+        controllerData = GetCarControllerData();
+        turnID = GetTurnID();
+
+        baseSpeed = Random.Range(5, 10f);
         newSpeed = baseSpeed;
         rb = GetComponent<Rigidbody>();
-        Destroy(gameObject, lifeTime);
+
+        if(currentNode != null)
+        {
+            SetStartingNode(currentNode);
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (currentNode != null)
+        if(currentNode != null)
         {
-            nextNode = currentNode.next;
-            if (nextNode != null)
+            GoToNextNode();
+            if(ReachedNextNode())
             {
-                transform.LookAt(nextNode.transform);
-            }
-            rb.velocity = newSpeed * transform.forward;
-            if (ReachedNextNode())
-            {
-                currentNode = nextNode.next;
+                SetCurrentAndNext(nextNode);
             }
         }
+    }
 
-        GetCarInfront();
-        if(carInfrontRb != null)
+    public void SetStartingNode(RoadNode newCurrentNode)
+    {
+        if(controllerData == null)
         {
-            ChangeVelocityToAvoidCollision();
+            controllerData = GetCarControllerData();
+            turnID = GetTurnID();
+        }
+        //SetCurrentAndNext(newCurrentNode);
+        currentNode = newCurrentNode;
+        transform.position = newCurrentNode.transform.position;
+        if (currentNode.nexts.Length > 0)
+        {
+            nextNode = newCurrentNode.nexts[0];
+            ChangeLookingDirection(nextNode);
+        }
+        else
+        {
+            nextNode = null;
+            transform.rotation = newCurrentNode.transform.rotation;
+        }
+    }
+
+    private void SetCurrentAndNext(RoadNode newCurrentNode)
+    {
+        currentNode = newCurrentNode;
+        nextNode = GetNextNode(turnID);
+        ChangeLookingDirection(nextNode);
+        turnID += controllerData.turnRandomNum;
+    }
+
+    private bool ReachedNextNode()
+    {
+        if (nextNode != null)
+        {
+            float distance = (transform.position - nextNode.transform.position).magnitude;
+            return distance < rechedNodeDistance;
+        }
+        else
+            return false;
+    }
+
+    private void GoToNextNode()
+    {
+        Rigidbody frontCarRB = GetFrontCarRB();
+        ChangeVelocityToAvoidCollision(frontCarRB);
+        rb.velocity = newSpeed * transform.forward;
+    }
+
+    private void ChangeVelocityToAvoidCollision(Rigidbody frontCarRB)
+    {
+        if (frontCarRB != null)
+        {
+            float distance = (transform.position - frontCarRB.transform.position).magnitude - (carLength / 2);
+            newSpeed = baseSpeed * ((distance - stoppingDistance) / detectionDistance);
         }
         else
         {
             newSpeed = baseSpeed;
         }
-
     }
 
-    public void SetStartingNode(LaneConnection startingNode)
-    {
-        currentNode = startingNode;
-    }
-
-    private bool ReachedNextNode()
-    {
-        float distance = (transform.position - nextNode.transform.position).magnitude;
-        return distance < 0.1f;
-    }
-
-    private void ChangeVelocityToAvoidCollision()
-    {
-        float distance = (transform.position - carInfrontRb.transform.position).magnitude - (carLength / 2);
-        newSpeed = baseSpeed * ((distance - stoppingDistance) / detectionDistance);
-    }
-
-    private void GetCarInfront()
+    private Rigidbody GetFrontCarRB()
     {
         Physics.Raycast(transform.position, transform.forward, out RaycastHit hitInfo, detectionDistance, carLayerMask, QueryTriggerInteraction.Collide);
         if(hitInfo.collider != null)
         {
-            carInfrontRb = hitInfo.collider.GetComponent<Rigidbody>();
+            return hitInfo.collider.GetComponent<Rigidbody>();
         }
         else
         {
-            carInfrontRb = null;
+            return null;
+        }
+    }
+
+    private void ChangeLookingDirection(RoadNode target)
+    {
+        if (target != null)
+        {
+            transform.LookAt(target.transform.position, Vector3.up);
+        }
+    }
+
+    private CarControllerData GetCarControllerData()
+    {
+        GameObject[] listOfDataObjects = GameObject.FindGameObjectsWithTag("carControllerData");  //Should only be 1, but just in case
+        CarControllerData data = listOfDataObjects[0].GetComponent<CarControllerData>();
+        return data;
+        
+    }
+
+    private int GetTurnID()
+    {
+        return Random.Range(0, 2147483647);
+    }
+
+    private RoadNode GetNextNode(int currentID)
+    {
+        if (nextNode != null)
+        {
+            int choice = Mathf.Abs(currentID) % nextNode.nexts.Length;
+            return nextNode.nexts[choice];
+        }
+        else
+        {
+            return null;
         }
     }
 }
