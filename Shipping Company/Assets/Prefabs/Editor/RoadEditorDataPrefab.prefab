@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &4860795312937633706
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1076135667297742208}
+  - component: {fileID: 8676798017853898787}
+  m_Layer: 0
+  m_Name: RoadEditorDataPrefab
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1076135667297742208
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4860795312937633706}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &8676798017853898787
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4860795312937633706}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 082a4827b805c2f4b849983c436c956a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  prefabs:
+  - {fileID: 4613616406759853158, guid: 4d15965d54ddb8346a462177a9d6544f, type: 3}
+  - {fileID: 4613616406759853158, guid: 37d99b0200dc0414192d422f5b06806b, type: 3}
+  - {fileID: 4613616406759853158, guid: a3e03683b72d61246b235ea8b64455f8, type: 3}
+  - {fileID: 4613616406759853158, guid: 88f5ac0d03e58814392b31b29d622e01, type: 3}
+  - {fileID: 4613616406759853158, guid: db6b435fce7bec346a6dc93656a464ae, type: 3}
+  textures:
+  - {fileID: 2800000, guid: f22ad1c12d433594da44be68422c6512, type: 3}
+  - {fileID: 2800000, guid: e94b902cd893e7240afacb9f9426418a, type: 3}
+  - {fileID: 2800000, guid: c1167d9da30425c4badc994db32af389, type: 3}
+  - {fileID: 2800000, guid: e23a418f375fe2d4e8608033aab1a2e7, type: 3}
+  - {fileID: 2800000, guid: 724ecb70fe44c0444ada4898059ba2e9, type: 3}
+  - {fileID: 2800000, guid: 88cb5d8dac06f414097e1cd439ae08ce, type: 3}
+  - {fileID: 2800000, guid: 2740afa714a83774ebdd198c800fe4e3, type: 3}
+  - {fileID: 2800000, guid: fa73ef1b52c4af540ae48cf6140959ff, type: 3}
+  - {fileID: 2800000, guid: 463f91220c88d7c4c9c15f7ae9a47214, type: 3}
+  gridSize: 15

@@ -10,13 +10,17 @@ public class RoadEditorWindow : EditorWindow
         GetWindow<RoadEditorWindow>();
     }
 
-    public Transform roadRoot;
-    public float gridSize = 15f;
-    public GameObject roadPrefab;
-    public GameObject roadPrefabCorner_R;
-    public GameObject roadPrefabCorner_L;
-    public GameObject roadPrefab_T;
-    public GameObject roadPrefab_X;
+    [SerializeField]
+    private GameObject dataPrefab;
+    [SerializeField]
+    private Transform roadRoot;
+
+
+    private float gridSize = 15f;
+    private GameObject roadPrefab, roadPrefabCorner_R, roadPrefabCorner_L, roadPrefab_T, roadPrefab_X;
+
+    private Texture2D roadButtonTexture, roadButtonRTexture, roadButtonLTexture, roadButtonTTexture, roadButtonXTexture;
+    private Texture2D arrowUpTexture, arrowRightTexture, arrowDownTexture, arrowLeftTexture;
 
     private GameObject currentRoadPrefab = null;
 
@@ -26,83 +30,196 @@ public class RoadEditorWindow : EditorWindow
 
     private string[] directions = { "forward", "right", "backward", "left" };
 
+    private int tab = 1;
+    private bool selectAndBuild = true;
+
+    private string currentOrientation = "forward";
+
     private void OnGUI()
     {
-        SerializedObject obj = new SerializedObject(this);
-        EditorGUILayout.PropertyField(obj.FindProperty("roadRoot"));
-        EditorGUILayout.PropertyField(obj.FindProperty("roadPrefab"));
-        EditorGUILayout.PropertyField(obj.FindProperty("roadPrefabCorner_R"));
-        EditorGUILayout.PropertyField(obj.FindProperty("roadPrefabCorner_L"));
-        EditorGUILayout.PropertyField(obj.FindProperty("roadPrefab_T"));
-        EditorGUILayout.PropertyField(obj.FindProperty("roadPrefab_X"));
-
-        if (roadRoot == null)
+        LoadDataFromPrefab();
+        string[] tabNames = { "Input", "Editor" };
+        tab = GUILayout.Toolbar(tab, tabNames);
+        switch(tab)
         {
-            EditorGUILayout.HelpBox("Root transform must be selected. Please assign root transform", MessageType.Warning);
-        }
-        else
-        {
-            EditorGUILayout.BeginHorizontal("box");
-            EditorGUILayout.BeginVertical("box");
-            DrawRoadButtons();
-            EditorGUILayout.EndVertical();
-            EditorGUILayout.EndHorizontal();
+            case 0:
+                SerializedObject obj = new SerializedObject(this);
+                EditorGUILayout.PropertyField(obj.FindProperty("roadRoot"));
+                EditorGUILayout.PropertyField(obj.FindProperty("dataPrefab"));
+                obj.ApplyModifiedProperties();
+
+                EditorGUILayout.BeginHorizontal("box");
+                DrawEditorOption();
+                EditorGUILayout.EndHorizontal();
+                break;
+
+            case 1:
+                if (roadRoot == null)
+                {
+                    EditorGUILayout.HelpBox("Root transform must be selected. Please assign root transform", MessageType.Warning);
+                }
+                else if(dataPrefab == null)
+                {
+                    EditorGUILayout.HelpBox("Data prefab is missing, please assign data prefab", MessageType.Warning);
+                }
+                else
+                {
+                    
+                    EditorGUILayout.BeginHorizontal("box");
+                    DrawRoadSelectionButtons();
+                    EditorGUILayout.EndHorizontal();
+                    EditorGUILayout.BeginVertical("box");
+                    DrawRoadContinueButtons();
+                    EditorGUILayout.EndVertical();
+                    EditorGUILayout.BeginVertical("box");
+                    DrawRoadCreationButtons();
+                    EditorGUILayout.EndVertical();
+                }
+                break;
+
         }
 
-        obj.ApplyModifiedProperties();
+
+
     }
 
-    private void DrawRoadButtons()
+    private void DrawEditorOption()
+    {
+        selectAndBuild = GUILayout.Toggle(selectAndBuild, "Select & Build");
+    }
+
+    private void DrawRoadSelectionButtons()
     {
 
-        if (GUILayout.Button("Select I Road"))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTexture, RoadBase.DirectionToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefab;
-        }
-
-        if (GUILayout.Button("Select Corner L"))
-        {
-            currentRoadPrefab = roadPrefabCorner_L;
-        }
-
-        if (GUILayout.Button("Select Corner R"))
-        {
-            currentRoadPrefab = roadPrefabCorner_R;
-        }
-
-        if (GUILayout.Button("Select T"))
-        {
-            currentRoadPrefab = roadPrefab_T;
-        }
-
-        if (GUILayout.Button("Select X"))
-        {
-            currentRoadPrefab = roadPrefab_X;
-        }
-
-        if (GUILayout.Button("Create Road"))
-        {
-            RoadBase currentRoad = NewRoad(currentRoadPrefab);
-            RoadBase nextRoad = FindNextRoadAndSetInLanes(currentRoad);
-            if (nextRoad != null)
+            if(selectAndBuild)
             {
-                currentRoad.ConnectToNextRoad(nextRoad);
+                NewRoadButtonCallback();
             }
         }
 
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonRTexture, RoadBase.DirectionToInd(currentOrientation))))
+        {
+            currentRoadPrefab = roadPrefabCorner_R;
+            if (selectAndBuild)
+            {
+                NewRoadButtonCallback();
+            }
+        }
+
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonLTexture, RoadBase.DirectionToInd(currentOrientation))))
+        {
+            currentRoadPrefab = roadPrefabCorner_L;
+            if (selectAndBuild)
+            {
+                NewRoadButtonCallback();
+            }
+        }
+
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTTexture, RoadBase.DirectionToInd(currentOrientation))))
+        {
+            currentRoadPrefab = roadPrefab_T;
+            if (selectAndBuild)
+            {
+                NewRoadButtonCallback();
+            }
+        }
+
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonXTexture, RoadBase.DirectionToInd(currentOrientation))))
+        {
+            currentRoadPrefab = roadPrefab_X;
+            if (selectAndBuild)
+            {
+                NewRoadButtonCallback();
+            }
+        }
+
+    }
+
+    private void DrawRoadContinueButtons()
+    {
         if (Selection.activeGameObject?.GetComponent<IRoadInterface>() != null)
         {
             IRoadInterface currentRoad = Selection.activeGameObject?.GetComponent<IRoadInterface>();
-            foreach (string dir in directions)
+            string dir;
+            bool isDisabled = false;
+
+            GUILayout.BeginHorizontal();
+            dir = "forward";
+            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            EditorGUI.BeginDisabledGroup(isDisabled);
+            if (GUILayout.Button(arrowUpTexture))
             {
-                if (currentRoad.IsDirectionConnectable(dir) && Selection.activeGameObject?.GetComponent<RoadBase>().createDirection != dir)
-                {
-                    if(GUILayout.Button("Continue " + dir))
-                    {
-                        currentRoad.SetCreateDirAndLanesOut(dir);
-                    }
-                }
+                currentRoad.SetCreateDirAndLanesOut(dir);
+                currentOrientation = dir;
             }
+            EditorGUI.EndDisabledGroup();
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            dir = "left";
+            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            EditorGUI.BeginDisabledGroup(isDisabled);
+            if (GUILayout.Button(arrowLeftTexture))
+            {
+                currentRoad.SetCreateDirAndLanesOut(dir);
+                currentOrientation = dir;
+            }
+            EditorGUI.EndDisabledGroup();
+
+            dir = "right";
+            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            EditorGUI.BeginDisabledGroup(isDisabled);
+            if (GUILayout.Button(arrowRightTexture))
+            {
+                currentRoad.SetCreateDirAndLanesOut(dir);
+                currentOrientation = dir;
+            }
+            EditorGUI.EndDisabledGroup();
+            GUILayout.EndHorizontal();
+
+            GUILayout.BeginHorizontal();
+            dir = "backward";
+            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            EditorGUI.BeginDisabledGroup(isDisabled);
+            if (GUILayout.Button(arrowDownTexture))
+            {
+                currentRoad.SetCreateDirAndLanesOut(dir);
+                currentOrientation = dir;
+            }
+            EditorGUI.EndDisabledGroup();
+            GUILayout.EndHorizontal();
+        }
+        else
+        {
+            if (GUILayout.Button("Reset Direction"))
+            {
+                currentOrientation = "forward";
+            }
+        }
+    }
+
+    private void DrawRoadCreationButtons()
+    {
+        if (!selectAndBuild)
+        {
+            if (GUILayout.Button("Create Road"))
+            {
+                NewRoadButtonCallback();
+            }
+        }
+    }
+
+    private void NewRoadButtonCallback()
+    {
+        RoadBase currentRoad = NewRoad(currentRoadPrefab);
+        RoadBase nextRoad = FindNextRoadAndSetInLanes(currentRoad);
+        currentOrientation = currentRoad.createDirection;
+        if (nextRoad != null)
+        {
+            currentRoad.ConnectToNextRoad(nextRoad);
         }
     }
     
@@ -195,6 +312,39 @@ public class RoadEditorWindow : EditorWindow
             nextRoadInLanes[1] = swap;
         }
         return nextRoadInLanes;
+    }
+
+    private void LoadDataFromPrefab()
+    {
+        if (dataPrefab != null)
+        {
+            RoadEditorData data = dataPrefab.GetComponent<RoadEditorData>();
+
+            gridSize = data.gridSize;
+
+            roadPrefab = data.prefabs[0];
+            roadPrefabCorner_R = data.prefabs[1];
+            roadPrefabCorner_L = data.prefabs[2];
+            roadPrefab_T = data.prefabs[3];
+            roadPrefab_X = data.prefabs[4];
+
+            roadButtonTexture = data.textures[0];
+            roadButtonRTexture = data.textures[1];
+            roadButtonLTexture = data.textures[2];
+            roadButtonTTexture = data.textures[3];
+            roadButtonXTexture = data.textures[4];
+
+            arrowUpTexture = data.textures[5];
+            arrowRightTexture = data.textures[6];
+            arrowDownTexture = data.textures[7];
+            arrowLeftTexture = data.textures[8];
+        }
+    }
+
+    private bool IsDirectionButtonDisabled(IRoadInterface currentRoad, GameObject currentlySelected, string dir)
+    {
+        return !(currentRoad.IsDirectionConnectable(dir));
+    //&& currentlySelected?.GetComponent<RoadBase>()?.createDirection != dir);
     }
 }
 
