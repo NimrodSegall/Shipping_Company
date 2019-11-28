@@ -7,6 +7,7 @@ using UnityEngine;
 // right after all lanes get connected (to save time, and make sure that if there are many lanes this doesn't mess up)
 public class CarSpawner : MonoBehaviour
 {
+    /*
     [SerializeField]
     private float searchRadius = 5f;
     [SerializeField]
@@ -22,8 +23,6 @@ public class CarSpawner : MonoBehaviour
 
     private float spawnDelay = 1;
     private float lastSpawnTime = 0;
-
-    private bool allowUpdate = false;
 
     // Start is called before the first frame update
     void Start()
@@ -72,4 +71,5 @@ public class CarSpawner : MonoBehaviour
     {
         return Random.Range(minDelayBetweenSpawns, maxDelayBetweenSpawns);
     }
+    */
 }

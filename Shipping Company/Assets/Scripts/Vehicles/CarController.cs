@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
+    /*
     //public static int turnSeed = (int)Random.Range(0, 2147483647);  //Number between [0, INT_MAX)
     public int turnID = 0;
     public float carLength = 1f;
@@ -12,9 +13,6 @@ public class CarController : MonoBehaviour
 
     [SerializeField]
     private float baseSpeed = 7f;
-
-    [SerializeField]
-    private float lifeTime = 1000f;
 
     [SerializeField]
     private float detectionDistance = 10f;
@@ -31,13 +29,13 @@ public class CarController : MonoBehaviour
 
     private float rechedNodeDistance = 0.5f;
 
-    private CarControllerData controllerData = null;
+    private CarControllerData controllerData = CarControllerData.current;
 
     // Start is called before the first frame update
     void Start()
     {
-        controllerData = GetCarControllerData();
-        turnID = GetTurnID();
+        CarControllerData.current.onRandomCarTurn += OnRandomTurn;
+        turnID = CarControllerData.GetNewRandomNum();
 
         baseSpeed = Random.Range(5, 10f);
         newSpeed = baseSpeed;
@@ -47,12 +45,13 @@ public class CarController : MonoBehaviour
         {
             SetStartingNode(currentNode);
         }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        if(currentNode != null)
+        if (currentNode != null)
         {
             GoToNextNode();
             if(ReachedNextNode())
@@ -62,14 +61,15 @@ public class CarController : MonoBehaviour
         }
     }
 
+    private void OnRandomTurn()
+    {
+        turnID += controllerData.turnRandomNum;
+    }
+
     public void SetStartingNode(RoadNode newCurrentNode)
     {
-        if(controllerData == null)
-        {
-            controllerData = GetCarControllerData();
-            turnID = GetTurnID();
-        }
-        //SetCurrentAndNext(newCurrentNode);
+        turnID = CarControllerData.GetNewRandomNum();
+        SetCurrentAndNext(newCurrentNode);
         currentNode = newCurrentNode;
         transform.position = newCurrentNode.transform.position;
         if (currentNode.nexts.Length > 0)
@@ -144,24 +144,21 @@ public class CarController : MonoBehaviour
         }
     }
 
-    private CarControllerData GetCarControllerData()
-    {
-        GameObject[] listOfDataObjects = GameObject.FindGameObjectsWithTag("carControllerData");  //Should only be 1, but just in case
-        CarControllerData data = listOfDataObjects[0].GetComponent<CarControllerData>();
-        return data;
-        
-    }
-
-    private int GetTurnID()
-    {
-        return Random.Range(0, 2147483647);
-    }
-
     private RoadNode GetNextNode(int currentID)
     {
         if (nextNode != null)
         {
-            int choice = Mathf.Abs(currentID) % nextNode.nexts.Length;
+            int choice;
+            if(nextNode.nexts.Length > 1)
+            {
+                OnRandomTurn();
+                choice = Mathf.Abs(turnID) % nextNode.nexts.Length;
+            }
+            else
+            {
+                choice = 0;
+            }
+           
             return nextNode.nexts[choice];
         }
         else
@@ -169,4 +166,5 @@ public class CarController : MonoBehaviour
             return null;
         }
     }
+    */
 }

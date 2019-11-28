@@ -1,15 +1,16 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CarControllerData : MonoBehaviour
 {
+    public static CarControllerData current;
     public int turnRandomNum = 0;
 
-    // Start is called before the first frame update
-    void Start()
+    private void Awake()
     {
-        gameObject.tag = "carControllerData";
+        current = this;
     }
 
     // Update is called once per frame
@@ -18,8 +19,14 @@ public class CarControllerData : MonoBehaviour
         turnRandomNum = GetNewRandomNum();
     }
 
-    private int GetNewRandomNum()
+    public event Action onRandomCarTurn;
+    public void RandomCarTurn()
     {
-        return Random.Range(0, 2147483647);
+        onRandomCarTurn?.Invoke();
+    }
+
+    public static int GetNewRandomNum()
+    {
+        return UnityEngine.Random.Range(0, 2147483647);
     }
 }

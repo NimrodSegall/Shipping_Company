@@ -8,6 +8,10 @@ TagManager:
   - laneConnection
   - car
   - carControllerData
+  - Entrance
+  - Exit
+  - Branch
+  - Road_T
   layers:
   - Default
   - TransparentFX
@@ -19,7 +23,7 @@ TagManager:
   - 
   - Vehicles
   - RoadNodes
-  - 
+  - RoadSegments
   - 
   - 
   - 
