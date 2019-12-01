@@ -10,9 +10,12 @@ public class Waypoint : MonoBehaviour
     [Range(0f, 5f)]
     public float width = 0.5f;
 
-    public List<Waypoint> branches;
+    //public List<Waypoint> branches;
+    public Waypoint[] branches;
     [Range(0f, 1f)]
     public float branchRatio = 0.5f;
+
+    public RoadNode graphNode = null;
 
     public Vector3 GetPosition()
     {
@@ -25,5 +28,10 @@ public class Waypoint : MonoBehaviour
     {
         this.next = other;
         other.prev = this;
+    }
+
+    public void DebugRay(Waypoint other)
+    {
+        Debug.DrawRay(transform.position, other.transform.position - transform.position, Color.white, 100f, false);
     }
 }
