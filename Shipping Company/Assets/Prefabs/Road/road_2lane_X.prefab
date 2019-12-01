@@ -79,14 +79,9 @@ MonoBehaviour:
   - {fileID: 3910864162175757636}
   - {fileID: 3816169655441157795}
   - {fileID: 1610285690308557884}
-  lanesOut:
-  - {fileID: 3100905806285488987}
-  - {fileID: 599687298342741780}
-  lanesIn:
-  - {fileID: 3100905806285488987}
-  - {fileID: 599687298342741780}
   createDirection: forward
   orientation: forward
+  connectedDirections: 00000000
 --- !u!1001 &2085469588915940964
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -153,6 +148,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}
@@ -935,6 +935,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}
 --- !u!114 &7740347633784216501 stripped
@@ -1221,6 +1226,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}
 --- !u!4 &5094654795110030296 stripped
@@ -1313,6 +1323,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}

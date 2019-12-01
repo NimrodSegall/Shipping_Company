@@ -5,37 +5,16 @@ namespace RoadTypes
     public class RoadStraight : RoadBase, IRoadInterface
     {
 
-        public void SetCreateDirAndLanesOut(string newDir)
+        public void SetCreateDirection(string newDir)
         {
             createDirection = newDir;
-            SetOutLanes();
-        }
-
-        public void SetOutLanes()
-        {
-            if(orientation == createDirection)
-            {
-                lanesOut[0] = lanes[0];
-                lanesOut[1] = lanes[1];
-            }
-            else
-            {
-                lanesOut[0] = lanes[1];
-                lanesOut[1] = lanes[0];
-            }
-        }
-
-        public void SetInLanes(GameObject[] inLanes)
-        {
-            lanesIn[0] = inLanes[0];
-            lanesIn[1] = inLanes[1];
         }
 
         public bool IsDirectionConnectable(string direction)
         {
             Vector3 vecDir = DirToVec(direction);
             // Is the direction transform.forward or -transform.forward?
-            if (IsAlmostOne(Mathf.Abs(Vector3.Dot(vecDir, transform.forward))))
+            if (Utilities.IsAlmostOne(Mathf.Abs(Vector3.Dot(vecDir, transform.forward))))
             {
                 return true;
             }
@@ -49,7 +28,7 @@ namespace RoadTypes
         {
             Vector3 vecDir = direction;
             // Is the direction transform.forward or -transform.forward?
-            if (IsAlmostOne(Mathf.Abs(Vector3.Dot(vecDir, transform.forward))))
+            if (Utilities.IsAlmostOne(Mathf.Abs(Vector3.Dot(vecDir, transform.forward))))
             {
                 return true;
             }
@@ -59,7 +38,7 @@ namespace RoadTypes
             }
         }
 
-        public void CreateRoad(RoadBase prevRoad, float gridSize)
+        public void CreateRoad(RoadBase prevRoad, float gridSize, string newOrientation, Vector3[] newPosVec)
         {
             if (prevRoad != null)
             {
@@ -68,8 +47,6 @@ namespace RoadTypes
                 orientation = prevRoad.createDirection;
 
                 transform.forward = DirToVec(prevRoad.createDirection);
-                SetOutLanes();
-                ConnectToPrevRoad(prevRoad);
             }
         }
     }

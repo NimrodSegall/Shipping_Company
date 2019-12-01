@@ -104,14 +104,9 @@ MonoBehaviour:
   - {fileID: 7582157676311957994}
   - {fileID: 6534529044075168433}
   - {fileID: 4975717110928515}
-  lanesOut:
-  - {fileID: 7582157676311957994}
-  - {fileID: 5010842121087520252}
-  lanesIn:
-  - {fileID: 6836365405403621309}
-  - {fileID: 1079185580973402317}
   createDirection: right
   orientation: forward
+  connectedDirections: 00000000
 --- !u!1001 &530986310492897394
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -270,6 +265,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}
@@ -819,6 +819,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}
 --- !u!114 &6041326582638861884 stripped
@@ -911,6 +916,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2346414317094755183, guid: 03564c5a3824586458909049d7d5d9ae,
+        type: 3}
+      propertyPath: isOutwards
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 03564c5a3824586458909049d7d5d9ae, type: 3}

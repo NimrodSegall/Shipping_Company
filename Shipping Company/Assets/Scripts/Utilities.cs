@@ -33,4 +33,16 @@ public class Utilities : MonoBehaviour
         }
         return rotatingTexture;
     }
+
+    public static bool IsAlmostOne(float num)
+    {
+        if (num > 0.98f && num < 1.02f)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 }

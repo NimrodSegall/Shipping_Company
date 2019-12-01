@@ -20,4 +20,10 @@ public class Waypoint : MonoBehaviour
         Vector3 maxBound = transform.position - transform.right * width / 2;
         return Vector3.Lerp(minBound, maxBound, Random.Range(0f, 1f));
     }
+
+    public void ConnectToNext(Waypoint other)
+    {
+        this.next = other;
+        other.prev = this;
+    }
 }

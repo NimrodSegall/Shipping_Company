@@ -5,32 +5,18 @@ namespace RoadTypes
     [SelectionBase]
     public class RoadBase : MonoBehaviour
     {
-        private static string[] directions = { "forward", "right", "backward", "left" };
+        public static string[] directions = { "forward", "right", "backward", "left" };
 
         public GameObject[] lanes = null;
-        public GameObject[] lanesOut = new GameObject[2];
-        //[HideInInspector]
-        public GameObject[] lanesIn = new GameObject[2];
+
         public string createDirection = "forward";
         public string orientation = "forward";
 
-        public static bool IsAlmostOne(float num)
-        {
-            if (num > 0.98f && num < 1.02f)
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public static int DirectionToInd(string checkedDirection)
+        public static int DirToInd(string dir)
         {
             for (int i = 0; i < directions.Length; i++)
             {
-                if (directions[i] == checkedDirection)
+                if (directions[i] == dir)
                     return i;
             }
             return -1;
@@ -76,7 +62,7 @@ namespace RoadTypes
             Vector3[] vecDirs = { Vector3.forward, Vector3.right, -Vector3.forward, -Vector3.right };
             for (int i = 0; i< vecDirs.Length; i++)
             {
-                if(IsAlmostOne(Vector3.Dot(DirToVec(dir), vecDirs[i])))
+                if(Utilities.IsAlmostOne(Vector3.Dot(DirToVec(dir), vecDirs[i])))
                 {
                     return VecToDir(vecDirs[i]);
                 }
@@ -90,7 +76,7 @@ namespace RoadTypes
             string[] strDirs = { "forward", "right", "backward", "left" };
             for (int i = 0; i < vecDirs.Length; i++)
             {
-                if (IsAlmostOne(Vector3.Dot(dir, vecDirs[i])))
+                if (Utilities.IsAlmostOne(Vector3.Dot(dir, vecDirs[i])))
                 {
                     return strDirs[i];
                 }
@@ -100,12 +86,12 @@ namespace RoadTypes
 
         public int RotationDistance(string dir1, string dir2)
         {
-            return (DirectionToInd(dir2) - DirectionToInd(dir1) + directions.Length) % directions.Length;
+            return (DirToInd(dir2) - DirToInd(dir1) + directions.Length) % directions.Length;
         }
 
-        public string RotateRight(string direction, int times)
+        public static string RotateClockwise(string direction, int times)
         {
-            int numberOfRotations = (DirectionToInd(direction) + times + directions.Length) % directions.Length;
+            int numberOfRotations = (DirToInd(direction) + times + directions.Length) % directions.Length;
             return directions[numberOfRotations];
         }
 
@@ -113,46 +99,28 @@ namespace RoadTypes
         public string RelativeDirection(string globalDirection)
         {
             int timesToRotate = RotationDistance(globalDirection, orientation);
-            return RotateRight(globalDirection, timesToRotate);
+            return RotateClockwise(globalDirection, timesToRotate);
         }
 
-        public void ConnectToPrevRoad(RoadBase prevRoad)
+        public static void ConnectRoads(Waypoint[][] orderedFromConnection)
         {
-            Waypoint lane0Waypoint;
-            Waypoint lane1Waypoint;
-            if(IsSumOfDistMin(lanesIn[0].GetComponent<Waypoint>(), lanesIn[1].GetComponent<Waypoint>(),
-                prevRoad.lanesOut[0].GetComponent<Waypoint>(), prevRoad.lanesOut[1].GetComponent<Waypoint>()))
-            {
-                lane0Waypoint = lanesIn[0].GetComponent<Waypoint>();
-                lane1Waypoint = lanesIn[1].GetComponent<Waypoint>();
-            }
-            else
-            {
-                lane0Waypoint = lanesIn[1].GetComponent<Waypoint>();
-                lane1Waypoint = lanesIn[0].GetComponent<Waypoint>();
-            }
-            lane0Waypoint.prev = prevRoad.lanesOut[0].GetComponent<Waypoint>();
-            lane0Waypoint.prev.next = lane0Waypoint;
+            Waypoint[] fromWaypoints = orderedFromConnection[0];
+            Waypoint[] toWaypoints = orderedFromConnection[1];
 
-            lane1Waypoint.next = prevRoad.lanesOut[1].GetComponent<Waypoint>();
-            lane1Waypoint.next.prev = lane1Waypoint;
-        }
+            Debug.Log(fromWaypoints[0]);
+            Debug.Log(fromWaypoints[1]);
 
-        public void ConnectToNextRoad(RoadBase nextRoad)
-        {
-            Waypoint lane0Waypoint = lanesIn[0].GetComponent<Waypoint>();
-            Waypoint lane1Waypoint = lanesIn[1].GetComponent<Waypoint>();
-            lane0Waypoint.next = nextRoad.lanesIn[0].GetComponent<Waypoint>();
-            lane0Waypoint.next.prev = lane0Waypoint;
+            Debug.Log(toWaypoints[0]);
+            Debug.Log(toWaypoints[1]);
 
-            lane1Waypoint.prev = nextRoad.lanesIn[1].GetComponent<Waypoint>();
-            lane1Waypoint.prev.next = lane1Waypoint;
+            fromWaypoints[0].ConnectToNext(toWaypoints[0]);
+            fromWaypoints[1].ConnectToNext(toWaypoints[1]);
         }
 
         public string RotateRelativeTo(string defaultOrientation, string newOrientation)
         {
             int numOfRots = RotationDistance(defaultOrientation, newOrientation);
-            return RotateRight(createDirection, numOfRots);
+            return RotateClockwise(createDirection, numOfRots);
         }
 
         public static bool IsSumOfDistMin(Vector3 p0, Vector3 p1, Vector3 q0, Vector3 q1)

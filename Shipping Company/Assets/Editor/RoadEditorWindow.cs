@@ -21,14 +21,14 @@ public class RoadEditorWindow : EditorWindow
 
     private Texture2D roadButtonTexture, roadButtonRTexture, roadButtonLTexture, roadButtonTTexture, roadButtonXTexture;
     private Texture2D arrowUpTexture, arrowRightTexture, arrowDownTexture, arrowLeftTexture;
+    private Texture2D arrowUpTexture_G, arrowRightTexture_G, arrowDownTexture_G, arrowLeftTexture_G;
+    private Texture2D clockwiseText, counterClockwiseText;
 
     private GameObject currentRoadPrefab = null;
 
     private float rayLength = 15f;
 
     private int roadLayerMask = 1 << 10;
-
-    private string[] directions = { "forward", "right", "backward", "left" };
 
     private int tab = 1;
     private bool selectAndBuild = true;
@@ -71,6 +71,9 @@ public class RoadEditorWindow : EditorWindow
                     EditorGUILayout.BeginVertical("box");
                     DrawRoadContinueButtons();
                     EditorGUILayout.EndVertical();
+                    EditorGUILayout.BeginHorizontal();
+                    DrawRotationButtons();
+                    EditorGUILayout.EndHorizontal();
                     EditorGUILayout.BeginVertical("box");
                     DrawRoadCreationButtons();
                     EditorGUILayout.EndVertical();
@@ -90,49 +93,48 @@ public class RoadEditorWindow : EditorWindow
 
     private void DrawRoadSelectionButtons()
     {
-
-        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTexture, RoadBase.DirectionToInd(currentOrientation))))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTexture, RoadBase.DirToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefab;
             if(selectAndBuild)
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
             }
         }
 
-        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonRTexture, RoadBase.DirectionToInd(currentOrientation))))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonRTexture, RoadBase.DirToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefabCorner_R;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
             }
         }
 
-        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonLTexture, RoadBase.DirectionToInd(currentOrientation))))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonLTexture, RoadBase.DirToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefabCorner_L;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
             }
         }
 
-        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTTexture, RoadBase.DirectionToInd(currentOrientation))))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonTTexture, RoadBase.DirToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefab_T;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
             }
         }
 
-        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonXTexture, RoadBase.DirectionToInd(currentOrientation))))
+        if (GUILayout.Button(Utilities.RotateTextureClockwise(roadButtonXTexture, RoadBase.DirToInd(currentOrientation))))
         {
             currentRoadPrefab = roadPrefab_X;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
             }
         }
 
@@ -140,6 +142,10 @@ public class RoadEditorWindow : EditorWindow
 
     private void DrawRoadContinueButtons()
     {
+        Texture2D upButton = arrowUpTexture;
+        Texture2D rightButton = arrowRightTexture;
+        Texture2D downButton = arrowDownTexture;
+        Texture2D leftButton = arrowLeftTexture;
         if (Selection.activeGameObject?.GetComponent<IRoadInterface>() != null)
         {
             IRoadInterface currentRoad = Selection.activeGameObject?.GetComponent<IRoadInterface>();
@@ -150,9 +156,20 @@ public class RoadEditorWindow : EditorWindow
             dir = "forward";
             isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (GUILayout.Button(arrowUpTexture))
+            if(Selection.activeGameObject?.GetComponent<RoadBase>() != null)
             {
-                currentRoad.SetCreateDirAndLanesOut(dir);
+                if(Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                {
+                    upButton = arrowUpTexture_G; 
+                }
+            }
+            else
+            {
+                upButton = arrowUpTexture;
+            }
+            if (GUILayout.Button(upButton))
+            {
+                currentRoad.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -162,9 +179,20 @@ public class RoadEditorWindow : EditorWindow
             dir = "left";
             isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (GUILayout.Button(arrowLeftTexture))
+            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
             {
-                currentRoad.SetCreateDirAndLanesOut(dir);
+                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                {
+                    leftButton = arrowLeftTexture_G;
+                }
+            }
+            else
+            {
+                leftButton = arrowLeftTexture;
+            }
+            if (GUILayout.Button(leftButton))
+            {
+                currentRoad.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -172,9 +200,20 @@ public class RoadEditorWindow : EditorWindow
             dir = "right";
             isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (GUILayout.Button(arrowRightTexture))
+            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
             {
-                currentRoad.SetCreateDirAndLanesOut(dir);
+                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                {
+                    rightButton = arrowRightTexture_G;
+                }
+            }
+            else
+            {
+                rightButton = arrowRightTexture;
+            }
+            if (GUILayout.Button(rightButton))
+            {
+                currentRoad.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -184,9 +223,20 @@ public class RoadEditorWindow : EditorWindow
             dir = "backward";
             isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (GUILayout.Button(arrowDownTexture))
+            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
             {
-                currentRoad.SetCreateDirAndLanesOut(dir);
+                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                {
+                    downButton = arrowDownTexture_G;
+                }
+            }
+            else
+            {
+                downButton = arrowDownTexture;
+            }
+            if (GUILayout.Button(downButton))
+            {
+                currentRoad.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -207,30 +257,77 @@ public class RoadEditorWindow : EditorWindow
         {
             if (GUILayout.Button("Create Road"))
             {
-                NewRoadButtonCallback();
+                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+            }
+        }
+
+        if(Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+        {
+            if (GUILayout.Button("Delete Road"))
+            {
+                DestroyImmediate(Selection.activeGameObject);
             }
         }
     }
 
-    private void NewRoadButtonCallback()
+    private void DrawRotationButtons()
     {
-        RoadBase currentRoad = NewRoad(currentRoadPrefab);
-        RoadBase nextRoad = FindNextRoadAndSetInLanes(currentRoad);
-        currentOrientation = currentRoad.createDirection;
-        if (nextRoad != null)
+        EditorGUI.BeginDisabledGroup(Selection.activeGameObject?.GetComponent<RoadT>() == null);
+        if (GUILayout.Button(counterClockwiseText))
         {
-            currentRoad.ConnectToNextRoad(nextRoad);
+            RoadBase currentlySelectedRoad = Selection.activeGameObject.GetComponent<RoadBase>();
+            string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 3);
+            Vector3[] currentPos = { currentlySelectedRoad.transform.position };
+            string currentName = currentlySelectedRoad.name;
+            DestroyImmediate(currentlySelectedRoad.gameObject);
+            NewRoadButtonCallback(roadPrefab_T, newRotation, currentPos, currentName);
         }
+
+        if (GUILayout.Button(clockwiseText))
+        {
+            RoadBase currentlySelectedRoad = Selection.activeGameObject.GetComponent<RoadBase>();
+            string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 1);
+            Vector3[] currentPos = { currentlySelectedRoad.transform.position };
+            string currentName = currentlySelectedRoad.name;
+            DestroyImmediate(currentlySelectedRoad.gameObject);
+            NewRoadButtonCallback(roadPrefab_T, newRotation, currentPos, currentName);
+        }
+        EditorGUI.EndDisabledGroup();
+    }
+
+    // Using Vector3[] array since Vector3 is not nullable
+    private void NewRoadButtonCallback(GameObject currentRoadPrefab, string newOrientation, Vector3[] newPosVec, string newName)
+    {
+        RoadBase currentRoad = NewRoad(currentRoadPrefab, newOrientation, newPosVec, newName);
+        RaycastHit[] nearbyRoadHits = FindNearbyRoads(currentRoad);
+        for(int i = 0; i< nearbyRoadHits.Length; i++)
+        {
+            if (nearbyRoadHits[i].collider?.GetComponent<RoadBase>() != null)
+            {
+                Waypoint[] thisObjectWaypoint = FindWaypointsInRoadClosestToPoint(currentRoad, nearbyRoadHits[i].point);
+                Waypoint[] otherObjectWaypoints = FindWaypointsInRoadClosestToPoint(nearbyRoadHits[i].collider.GetComponent<RoadBase>(), nearbyRoadHits[i].point);
+                Waypoint[][] orderedForConnection = OrderWaypointsForConnection(thisObjectWaypoint, otherObjectWaypoints);
+                RoadBase.ConnectRoads(orderedForConnection);
+            }
+        }
+        currentOrientation = currentRoad.createDirection;
     }
     
-    private RoadBase NewRoad(GameObject roadPrefab)
+    private RoadBase NewRoad(GameObject roadPrefab, string newOrientation, Vector3[] newPositionTransform, string newName)
     {
         GameObject roadObject = Instantiate(roadPrefab, roadRoot);
-        roadObject.name = "Road " + roadRoot.childCount;
+        if (newName == null)
+        {
+            roadObject.name = "Road " + roadRoot.childCount;
+        }
+        else
+        { 
+            roadObject.name = newName;
+        }
         RoadBase prevRoad = GetPrevRoad();
         if (prevRoad != null)
         {
-            roadObject.GetComponent<IRoadInterface>().CreateRoad(prevRoad, gridSize);
+            roadObject.GetComponent<IRoadInterface>().CreateRoad(prevRoad, gridSize, newOrientation, newPositionTransform);
         }
         Selection.activeGameObject = roadObject;
         return roadObject.GetComponent<RoadBase>();
@@ -250,68 +347,136 @@ public class RoadEditorWindow : EditorWindow
         return prevRoad;
     }
 
-    private RoadBase FindNextRoadAndSetInLanes(RoadBase currentRoad)
+    private RaycastHit[] FindNearbyRoads(RoadBase currentRoad)
     {
-        RoadBase nextRoad = null;
-        int hitInd = 0;
-        RaycastHit[] hits = Physics.RaycastAll(currentRoad.transform.position, RoadBase.DirToVec(currentRoad.createDirection), rayLength, roadLayerMask);
-        if (hits.Length > 0)
+        RaycastHit[] objectHits = new RaycastHit[RoadBase.directions.Length];
+        for (int i = 0; i < RoadBase.directions.Length; i++)
         {
-
-            if (hits[0].collider.gameObject != currentRoad.gameObject)
+            string dir = RoadBase.directions[i];
+            // If can connect towards dir
+            if (currentRoad.GetComponent<IRoadInterface>().IsDirectionConnectable(dir))
             {
-                nextRoad = hits[0].collider.GetComponent<RoadBase>();
-            }
-            else if (hits.Length > 1)
-            {
-                if (hits[1].collider.gameObject != currentRoad.gameObject)
+                RaycastHit[] hits = Physics.RaycastAll(currentRoad.transform.position, RoadBase.DirToVec(dir), rayLength, roadLayerMask);
+                if (hits.Length > 0)
                 {
-                    nextRoad = hits[1].collider.GetComponent<RoadBase>();
+
+                    if (hits[0].collider.gameObject != currentRoad.gameObject)
+                    {
+                        objectHits[i] = hits[0];
+                    }
+                    else if (hits.Length > 1)
+                    {
+                        if (hits[1].collider.gameObject != currentRoad.gameObject)
+                        {
+                            objectHits[i] = hits[1];
+                        }
+                    }
+
                 }
             }
-            if (nextRoad != null)
-            {
-                Vector3 pointHit = hits[hitInd].point;
-                GameObject[] inLanes = FindInLanes(nextRoad, pointHit, currentRoad.lanesOut);
-                nextRoad.GetComponent<IRoadInterface>().SetInLanes(inLanes);
-            }
         }
-
-        return nextRoad;
+        return objectHits;
     }
 
-    private GameObject[] FindInLanes(RoadBase nextRoad, Vector3 pointHit, GameObject[] currentRoadOutLanes)
+    private Waypoint[] FindWaypointsInRoadClosestToPoint(RoadBase road, Vector3 pointHit)
     {
         float[] closestDistances = { Mathf.Infinity, Mathf.Infinity };
-        GameObject[] nextRoadInLanes = { null, null };
-        foreach (GameObject laneObject in nextRoad.lanes)
+        GameObject[] closestWaypointObjects = { null, null };
+        foreach (GameObject laneObject in road.lanes)
         {
             float distanceToPoint = (laneObject.transform.position - pointHit).magnitude;
-            if (distanceToPoint < closestDistances[0] && laneObject != nextRoadInLanes[1])
+            if (distanceToPoint < closestDistances[0] && laneObject != closestWaypointObjects[1])
             {
-                nextRoadInLanes[1] = nextRoad.lanesIn[0];
-                nextRoadInLanes[0] = laneObject;
+                closestWaypointObjects[1] = closestWaypointObjects[0];
+                closestWaypointObjects[0] = laneObject;
                 closestDistances[1] = closestDistances[0];
                 closestDistances[0] = distanceToPoint;
             }
-            else if (distanceToPoint < closestDistances[1] && laneObject != nextRoadInLanes[0])
+            else if (distanceToPoint < closestDistances[1] && laneObject != closestWaypointObjects[0])
             {
-                nextRoadInLanes[1] = laneObject;
+                closestWaypointObjects[1] = laneObject;
                 closestDistances[1] = distanceToPoint;
             }
         }
-        Vector3 posIn0 = nextRoadInLanes[0].transform.position;
-        Vector3 posIn1 = nextRoadInLanes[1].transform.position;
-        Vector3 posOut0 = currentRoadOutLanes[0].transform.position;
-        Vector3 posOut1 = currentRoadOutLanes[1].transform.position;
-        // Connect waypoints so sum of distances is minimal
-        if (!RoadBase.IsSumOfDistMin(posIn0, posIn1, posOut0, posOut1))
+        Waypoint[] closestWaypoints = {closestWaypointObjects[0].GetComponent<Waypoint>(),
+        closestWaypointObjects[1].GetComponent<Waypoint>()};
+        return closestWaypoints;
+    }
+
+    private Waypoint[][] OrderWaypointsForConnection(Waypoint[] waypoints0, Waypoint[] waypoints1)
+    {
+        Waypoint[] fromWaypoints = new Waypoint[2];
+        Waypoint[] toWaypoints = new Waypoint[2];
+        float xDist = Mathf.Abs(waypoints0[0].transform.position.x - waypoints0[1].transform.position.x);
+        float zDist = Mathf.Abs(waypoints0[0].transform.position.z - waypoints0[1].transform.position.z);
+
+        // Roads orient along the forward / backward direction
+        if(xDist > zDist)
         {
-            GameObject swap = nextRoadInLanes[0];
-            nextRoadInLanes[0] = nextRoadInLanes[1];
-            nextRoadInLanes[1] = swap;
+            float dz = waypoints1[0].transform.position.z - waypoints0[0].transform.position.z;
+            // Rightmost waypoint connects forward (waypoint.next = forwardWaypoint)
+            if (dz > 0)
+            {
+                fromWaypoints[0] = MoreRight(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+                fromWaypoints[1] = MoreLeft(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+
+                toWaypoints[0] = MoreRight(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+                toWaypoints[1] = MoreLeft(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+            }
+            else
+            {
+                fromWaypoints[0] = MoreLeft(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+                fromWaypoints[1] = MoreRight(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+
+                toWaypoints[0] = MoreLeft(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+                toWaypoints[1] = MoreRight(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+            }
         }
-        return nextRoadInLanes;
+        else
+        {
+            float dx = waypoints1[0].transform.position.x - waypoints0[0].transform.position.x;
+            // Backward most waypoint connects right (waypoint.next = rightWaypoint)
+            if (dx > 0)
+            {
+                fromWaypoints[0] = MoreBackward(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+                fromWaypoints[1] = MoreForward(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+
+                toWaypoints[0] = MoreBackward(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+                toWaypoints[1] = MoreForward(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+            }
+            else
+            {
+                fromWaypoints[0] = MoreForward(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+                fromWaypoints[1] = MoreBackward(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+
+                toWaypoints[0] = MoreForward(waypoints1[0].transform, waypoints1[1].transform).GetComponent<Waypoint>();
+                toWaypoints[1] = MoreBackward(waypoints0[0].transform, waypoints0[1].transform).GetComponent<Waypoint>();
+            }
+        }
+        Waypoint[][] outArray = { fromWaypoints, toWaypoints };
+        return outArray;
+
+
+    }
+
+    private Transform MoreRight(Transform t1, Transform t2)
+    {
+        return (t1.position.x > t2.position.x) ? t1 : t2;
+    }
+
+    private Transform MoreLeft(Transform t1, Transform t2)
+    {
+        return (t1.position.x < t2.position.x) ? t1 : t2;
+    }
+
+    private Transform MoreForward(Transform t1, Transform t2)
+    {
+        return (t1.position.z > t2.position.z) ? t1 : t2;
+    }
+
+    private Transform MoreBackward(Transform t1, Transform t2)
+    {
+        return (t1.position.z < t2.position.z) ? t1 : t2;
     }
 
     private void LoadDataFromPrefab()
@@ -338,6 +503,14 @@ public class RoadEditorWindow : EditorWindow
             arrowRightTexture = data.textures[6];
             arrowDownTexture = data.textures[7];
             arrowLeftTexture = data.textures[8];
+
+            arrowUpTexture_G = data.textures[9];
+            arrowRightTexture_G = data.textures[10];
+            arrowDownTexture_G = data.textures[11];
+            arrowLeftTexture_G = data.textures[12];
+
+            clockwiseText = data.textures[13];
+            counterClockwiseText = data.textures[14];
         }
     }
 
