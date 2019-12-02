@@ -7,6 +7,12 @@ public class Waypoint : MonoBehaviour
     public Waypoint prev;
     public Waypoint next;
 
+    public Waypoint leadingTo = null;
+
+    public bool isBranch = false;
+
+    public Waypoint[] allPrevs;
+
     [Range(0f, 5f)]
     public float width = 0.5f;
 
@@ -15,7 +21,7 @@ public class Waypoint : MonoBehaviour
     [Range(0f, 1f)]
     public float branchRatio = 0.5f;
 
-    public RoadNode graphNode = null;
+    public Pathfinding.RoadNode graphNode = null;
 
     public Vector3 GetPosition()
     {

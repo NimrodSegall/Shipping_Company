@@ -11,12 +11,12 @@ public class RoadEditorWindow : EditorWindow
     }
 
     [SerializeField]
-    private GameObject dataPrefab;
+    private GameObject dataPrefab = null;
     [SerializeField]
-    private Transform roadRoot;
+    private Transform roadRoot = null;
 
 
-    private float gridSize = 15f;
+    private float gridSize = GameParameters.gridSize;
     private GameObject roadPrefab, roadPrefabCorner_R, roadPrefabCorner_L, roadPrefab_T, roadPrefab_X;
 
     private Texture2D roadButtonTexture, roadButtonRTexture, roadButtonLTexture, roadButtonTTexture, roadButtonXTexture;

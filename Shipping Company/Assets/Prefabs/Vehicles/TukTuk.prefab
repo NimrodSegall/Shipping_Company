@@ -10,8 +10,9 @@ GameObject:
   m_Component:
   - component: {fileID: 3422899332823401312}
   - component: {fileID: 3408409681172661170}
-  - component: {fileID: 6562933464826796054}
   - component: {fileID: 6593211219324582155}
+  - component: {fileID: 5465753407892248835}
+  - component: {fileID: 6648770916245959379}
   m_Layer: 8
   m_Name: TukTuk
   m_TagString: car
@@ -51,25 +52,6 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 80
   m_CollisionDetection: 0
---- !u!114 &6562933464826796054
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3425828267701765260}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0c89972570ca8c143a6a991feb923176, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  turnID: 0
-  carLength: 4
-  baseSpeed: 7
-  lifeTime: 20
-  detectionDistance: 10
-  currentNode: {fileID: 0}
-  nextNode: {fileID: 0}
 --- !u!65 &6593211219324582155
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -83,6 +65,36 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 1.5, y: 1.7, z: 3.7}
   m_Center: {x: 0, y: 0.85, z: 0.1}
+--- !u!114 &5465753407892248835
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3425828267701765260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 46b6deadcdd309749b245db3c50e3b79, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  speed: 20
+  rotationSpeed: 1000
+--- !u!114 &6648770916245959379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3425828267701765260}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c4946f3902bc0844ae0c05a77b1dc8a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  currentWaypoint: {fileID: 0}
+  targetWaypoint: {fileID: 0}
+  path: []
+  pathPosition: 0
 --- !u!1 &5293865036401528635
 GameObject:
   m_ObjectHideFlags: 0

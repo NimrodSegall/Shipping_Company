@@ -45,4 +45,17 @@ public class Utilities : MonoBehaviour
             return false;
         }
     }
+
+    public static bool IsInArray<T>(T[] arr, T val) where T : class
+    {
+        foreach(T member in arr)
+        {
+            if(val == member)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
 }

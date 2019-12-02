@@ -7,9 +7,6 @@ using UnityEngine;
 // right after all lanes get connected (to save time, and make sure that if there are many lanes this doesn't mess up)
 public class CarSpawner : MonoBehaviour
 {
-    /*
-    [SerializeField]
-    private float searchRadius = 5f;
     [SerializeField]
     private float minDelayBetweenSpawns = 0.5f;
     [SerializeField]
@@ -17,7 +14,7 @@ public class CarSpawner : MonoBehaviour
     [SerializeField]
     private GameObject[] cars = null;
 
-    public RoadNode spawnNode = null;
+    public Waypoint spawnNode = null;
 
     private int nodeLayerMask = 1 << 9;
 
@@ -27,30 +24,16 @@ public class CarSpawner : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        if(spawnNode == null)
-        {
-            spawnNode = FindSpawnNode();
-        }
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        SpawnCars();
-    }
-
-    private RoadNode FindSpawnNode()
-    {
-        Collider[] collidersInRadius = Physics.OverlapSphere(transform.position, searchRadius, nodeLayerMask);
-        foreach (Collider col in collidersInRadius)
+        if (spawnNode != null)
         {
-            RoadNode node = col.GetComponentInParent<RoadNode>();
-            if (node.prevs[0] == null)
-            {
-                return node;
-            }
+            SpawnCars();
         }
-        return null;
     }
 
     private void SpawnCars()
@@ -60,8 +43,8 @@ public class CarSpawner : MonoBehaviour
             int carChoice = Random.Range(0, cars.Length);
             spawnDelay = NewSpawnDelay();
             lastSpawnTime = Time.time;
-            GameObject newCar = Instantiate(cars[carChoice], spawnNode.transform.position, Quaternion.identity);
-            newCar.GetComponent<CarController>().SetStartingNode(spawnNode);
+            GameObject newCar = Instantiate(cars[carChoice], transform.position, Quaternion.identity);
+            newCar.GetComponent<WaypointNavigator>().SetInitialWp(spawnNode, transform.forward, true);
         }
         
         
@@ -71,5 +54,5 @@ public class CarSpawner : MonoBehaviour
     {
         return Random.Range(minDelayBetweenSpawns, maxDelayBetweenSpawns);
     }
-    */
+
 }

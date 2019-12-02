@@ -1,89 +1,127 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class RoadNode
+namespace Pathfinding
 {
-    public List<RoadNode> nexts = new List<RoadNode>();
-    public List<RoadNode> prevs;
-
-    public Waypoint waypoint = null;
-
-    public bool beenInitialized = false;
-    public bool beenAddedToGraph = false;
-
-    public RoadNode(Waypoint startingWaypoint)
+    public class RoadNode
     {
-        waypoint = ClosestNodableWaypoint(startingWaypoint);
-    }
+        public List<RoadNode> nexts = new List<RoadNode>();
+        public List<RoadNode> prevs = new List<RoadNode>();
 
-    public void GetNexts()
-    {
-        if (waypoint != null)
+        public List<RoadEdge> nextEdges = new List<RoadEdge>();
+        public List<RoadEdge> prevEdges = new List<RoadEdge>();
+
+        public Waypoint waypoint = null;
+
+        public bool beenAddedToGraph = false;
+
+        public int id = 0;
+
+        public float minDist = Mathf.Infinity;
+        public RoadEdge minDistFrom = null;
+
+        public RoadNode(Waypoint startingWaypoint)
         {
-            Waypoint[] paths = GetPaths();
-            AssignNexts(paths);
+            Waypoint[] waypointsToNearestNext = ClosestNodableWaypoint(startingWaypoint);
+            if(waypointsToNearestNext.Length > 0)
+            waypoint = waypointsToNearestNext[waypointsToNearestNext.Length - 1];
         }
-        beenInitialized = true;
-    }
 
-    private Waypoint ClosestNodableWaypoint(Waypoint current)
-    {
-        if(current.branches.Length > 0)
+        public void GetNexts()
         {
-            return current;
-        }
-        else
-        {
-            return ClosestNodableWaypoint(current.next);
-        }
-    }
-
-    private Waypoint[] GetPaths()
-    {
-        Waypoint[] paths;
-        if (waypoint != null)
-        {
-            paths = new Waypoint[waypoint.branches.Length + 1];
-            paths[0] = waypoint.next;
-            for (int i = 1; i < waypoint.branches.Length + 1; i++)
+            if (waypoint != null)
             {
-                paths[i] = waypoint.branches[i - 1];
+                Waypoint[] paths = GetPaths();
+                AssignNexts(paths);
             }
         }
-        else
-        {
-            paths = null;
-        }
-        return paths;
-    }
 
-    private void AssignNexts(Waypoint[] paths)
-    {
-        foreach (Waypoint path in paths)
+        public RoadEdge NodeToEdge(RoadNode target)
         {
-            Waypoint nextWaypoint = ClosestNodableWaypoint(path);
-            if (nextWaypoint != null)
+            foreach(RoadEdge edge in nextEdges)
             {
-                if (nextWaypoint.graphNode == null)
+                if(edge.to == target)
                 {
-                    RoadNode next = new RoadNode(nextWaypoint);
-                    nextWaypoint.graphNode = next;
-
+                    return edge;
                 }
-                nexts.Add(nextWaypoint.graphNode);
+            }
+                return null;
+        }
+
+        private Waypoint[] GetPaths()
+        {
+            Waypoint[] paths;
+            if (waypoint != null)
+            {
+                paths = new Waypoint[waypoint.branches.Length + 1];
+                paths[0] = waypoint.next;
+                for (int i = 1; i < waypoint.branches.Length + 1; i++)
+                {
+                    paths[i] = waypoint.branches[i - 1];
+                }
+            }
+            else
+            {
+                paths = null;
+            }
+            return paths;
+        }
+
+        private void AssignNexts(Waypoint[] paths)
+        {
+            foreach (Waypoint path in paths)
+            {
+                Waypoint[] waypointsToNearestNext = ClosestNodableWaypoint(path);
+                Waypoint nextWaypoint = waypointsToNearestNext[waypointsToNearestNext.Length - 1];
+                if (nextWaypoint != null)
+                {
+                    if (nextWaypoint.graphNode == null)
+                    {
+                        RoadNode next = new RoadNode(nextWaypoint);
+                        nextWaypoint.graphNode = next;
+
+                    }
+                    nexts.Add(nextWaypoint.graphNode);
+                    nextWaypoint.graphNode.prevs.Add(this);
+
+                    RoadEdge edge = new RoadEdge(this, nextWaypoint.graphNode, waypointsToNearestNext);
+                    nextEdges.Add(edge);
+                    nextWaypoint.graphNode.prevEdges.Add(edge);
+                }
             }
         }
-    }
 
-    public void ShowPathToNexts()
-    {
-        if (waypoint != null)
+        private Waypoint[] ClosestNodableWaypoint(Waypoint current)
         {
-            foreach (RoadNode node in nexts)
+            List<Waypoint> allWpsOnEdge = new List<Waypoint>();
+            Waypoint wp = current;
+            allWpsOnEdge.Add(wp);
+            while (wp.branches.Length < 1)
             {
-                if (node.waypoint != null)
+                wp = wp.next;
+                allWpsOnEdge.Add(wp);
+            }
+            return allWpsOnEdge.ToArray();
+        }
+
+        public void Visualize(bool showNode, bool showPathsToNexts)
+        {
+            if (waypoint != null)
+            {
+                if (showNode)
                 {
-                    waypoint.DebugRay(node.waypoint);
+                    GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                    marker.transform.position = waypoint.transform.position;
+                }
+                if (showPathsToNexts)
+                {
+                    foreach (RoadNode node in nexts)
+                    {
+                        if (node.waypoint != null)
+                        {
+                            waypoint.DebugRay(node.waypoint);
+                        }
+                    }
                 }
             }
         }

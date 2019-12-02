@@ -10,6 +10,7 @@ public class WaypointNavigatorController : MonoBehaviour
     private float stopDistance = 2.5f;
 
     private Vector3 destination;
+
     // Start is called before the first frame update
     void Start()
     {

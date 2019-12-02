@@ -107,12 +107,6 @@ namespace RoadTypes
             Waypoint[] fromWaypoints = orderedFromConnection[0];
             Waypoint[] toWaypoints = orderedFromConnection[1];
 
-            Debug.Log(fromWaypoints[0]);
-            Debug.Log(fromWaypoints[1]);
-
-            Debug.Log(toWaypoints[0]);
-            Debug.Log(toWaypoints[1]);
-
             fromWaypoints[0].ConnectToNext(toWaypoints[0]);
             fromWaypoints[1].ConnectToNext(toWaypoints[1]);
         }

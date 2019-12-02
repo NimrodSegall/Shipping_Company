@@ -44,7 +44,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7aabbf76601117b4b85b5bb9de74b998, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  searchRadius: 5
   minDelayBetweenSpawns: 0.5
   maxDelayBetweenSpawns: 4
   cars:
@@ -75,7 +74,7 @@ PrefabInstance:
     - target: {fileID: 1219197670743816157, guid: c7ead412aa41c6349b2de970ee030beb,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: -2
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 1219197670743816157, guid: c7ead412aa41c6349b2de970ee030beb,
         type: 3}

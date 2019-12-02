@@ -1,69 +1,71 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class RoadGraph : MonoBehaviour
+namespace Pathfinding
 {
-    public List<RoadNode> nodes = new List<RoadNode>();
-
-    [SerializeField]
-    private Waypoint startWp = null;
-
-    private void Start()
+    public class RoadGraph
     {
-        Initialize(startWp);
-        VisualizeGraph();
-    }
+        public List<RoadNode> nodes = new List<RoadNode>();
+        public int numOfNodes = 0;
 
-    public void Add(RoadNode newNode)
-    {
-        if(!newNode.beenAddedToGraph)
-        {
-            nodes.Add(newNode);
-            newNode.beenAddedToGraph = true;
+        public RoadGraph(Waypoint startWp)
+        { 
+            Initialize(startWp);
         }
-    }
 
-    public void Initialize(Waypoint startWp)
-    {
-        nodes.Add(GetFirstNode(startWp));
-        GetAllNodes();
-    }
-
-    private RoadNode GetFirstNode(Waypoint startWp)
-    {
-        RoadNode node = new RoadNode(startWp);
-        node.GetNexts();
-        return node;
-    }
-
-    private void GetAllNodes()
-    {
-        int initCount = nodes.Count;
-        int currentCount = -1;
-
-        while (initCount != currentCount)
+        public void Add(RoadNode newNode)
         {
-            initCount = nodes.Count;
-            foreach (RoadNode graphNode in nodes.ToArray())
+            if (!newNode.beenAddedToGraph)
             {
-                foreach (RoadNode nextNode in graphNode.nexts)
+                nodes.Add(newNode);
+                newNode.beenAddedToGraph = true;
+                numOfNodes++;
+                newNode.id = numOfNodes;
+            }
+        }
+
+        public void Initialize(Waypoint startWp)
+        {
+            nodes.Add(GetFirstNode(startWp));
+            GetAllNodes();
+        }
+
+        private RoadNode GetFirstNode(Waypoint startWp)
+        {
+            RoadNode node = new RoadNode(startWp);
+            node.GetNexts();
+            return node;
+        }
+
+        private void GetAllNodes()
+        {
+            int initCount = nodes.Count;
+            int currentCount = -1;
+
+            while (initCount != currentCount)
+            {
+                initCount = nodes.Count;
+                foreach (RoadNode graphNode in nodes.ToArray())
                 {
-                    if (!nextNode.beenAddedToGraph)
+                    foreach (RoadNode nextNode in graphNode.nexts)
                     {
-                        Add(nextNode);
-                        nextNode.GetNexts();
+                        if (!nextNode.beenAddedToGraph)
+                        {
+                            Add(nextNode);
+                            nextNode.GetNexts();
+                        }
                     }
                 }
+                currentCount = nodes.Count;
             }
-            currentCount = nodes.Count;
         }
-    }
 
-    public void VisualizeGraph()
-    {
-        foreach (RoadNode node in nodes)
+        public void VisualizeGraph()
         {
-            node.ShowPathToNexts();
+            foreach (RoadNode node in nodes)
+            {
+                node.Visualize(true, false);
+            }
         }
     }
 }
