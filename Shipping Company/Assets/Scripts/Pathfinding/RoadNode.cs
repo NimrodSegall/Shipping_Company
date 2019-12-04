@@ -53,12 +53,7 @@ namespace Pathfinding
             Waypoint[] paths;
             if (waypoint != null)
             {
-                paths = new Waypoint[waypoint.branches.Length + 1];
-                paths[0] = waypoint.next;
-                for (int i = 1; i < waypoint.branches.Length + 1; i++)
-                {
-                    paths[i] = waypoint.branches[i - 1];
-                }
+                paths = waypoint.nexts.ToArray();
             }
             else
             {
@@ -96,9 +91,9 @@ namespace Pathfinding
             List<Waypoint> allWpsOnEdge = new List<Waypoint>();
             Waypoint wp = current;
             allWpsOnEdge.Add(wp);
-            while (wp.branches.Length < 1)
+            while (wp.nexts.ToArray().Length < 1)
             {
-                wp = wp.next;
+                wp = wp.nexts[0];
                 allWpsOnEdge.Add(wp);
             }
             return allWpsOnEdge.ToArray();

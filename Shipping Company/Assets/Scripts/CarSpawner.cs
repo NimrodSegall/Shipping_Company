@@ -16,8 +16,6 @@ public class CarSpawner : MonoBehaviour
 
     public Waypoint spawnNode = null;
 
-    private int nodeLayerMask = 1 << 9;
-
     private float spawnDelay = 1;
     private float lastSpawnTime = 0;
 

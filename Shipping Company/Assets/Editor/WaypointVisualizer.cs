@@ -23,7 +23,31 @@ public class WaypointVisualizer
         Gizmos.DrawLine(waypoint.transform.position + (waypoint.transform.right * waypoint.width / 2f), 
             waypoint.transform.position - (waypoint.transform.right * waypoint.width / 2f));
 
-        if (waypoint.prev != null)
+        foreach (Waypoint prev in waypoint.prevs)
+        {
+            if (prev != null)
+            {
+                Gizmos.color = Color.red;
+                Vector3 offset = waypoint.transform.right * waypoint.width / 2f;
+                Vector3 offsetTo = prev.transform.right * prev.width / 2f;
+                Gizmos.DrawLine(waypoint.transform.position + offset, prev.transform.position + offsetTo);
+            }
+        }
+
+        foreach(Waypoint next in waypoint.nexts)
+        {
+            if (next != null)
+            {
+                Gizmos.color = Color.green;
+                Vector3 offset = -waypoint.transform.right * waypoint.width / 2f;
+                Vector3 offsetTo = -next.transform.right * next.width / 2f;
+
+                Gizmos.DrawLine(waypoint.transform.position + offset, next.transform.position + offsetTo);
+            }
+        }
+
+        /*
+        if (waypoint.prevs.Count > 0)
         {
             Gizmos.color = Color.red;
             Vector3 offset = waypoint.transform.right * waypoint.width / 2f;
@@ -31,6 +55,7 @@ public class WaypointVisualizer
 
             Gizmos.DrawLine(waypoint.transform.position + offset, waypoint.prev.transform.position + offsetTo);
         }
+        
 
         if(waypoint.next != null)
         {
@@ -40,10 +65,11 @@ public class WaypointVisualizer
 
             Gizmos.DrawLine(waypoint.transform.position + offset, waypoint.next.transform.position + offsetTo);
         }
+        */
 
-        if(waypoint.branches != null)
+        if(waypoint.isBranch)
         {
-            foreach(Waypoint branch in waypoint.branches)
+            foreach(Waypoint branch in waypoint.nexts)
             {
                 if (branch != null)
                 {

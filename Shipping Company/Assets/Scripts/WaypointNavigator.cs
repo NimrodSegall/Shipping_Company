@@ -22,7 +22,8 @@ public class WaypointNavigator : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (currentWaypoint != null)
+        {
             if (isGuided)
             {
                 GuidedMotion();
@@ -31,6 +32,11 @@ public class WaypointNavigator : MonoBehaviour
             {
                 RandomMotion();
             }
+        }
+        else
+        {
+            Stop();
+        }
 
     }
 
@@ -54,6 +60,11 @@ public class WaypointNavigator : MonoBehaviour
         targetWaypoint = null;
     }
 
+    public void Stop()
+    {
+        controller.SetDestination(transform.position);
+    }
+
     private void GuidedMotion()
     {
         if (controller.ReachedDestination())
@@ -72,6 +83,14 @@ public class WaypointNavigator : MonoBehaviour
     {
         if (controller.ReachedDestination())
         {
+            if (currentWaypoint?.nexts?.Count > 0)
+            {
+                int choice = Random.Range(0, currentWaypoint.nexts.Count);
+                currentWaypoint = currentWaypoint.nexts[choice];
+                controller.SetDestination(currentWaypoint.GetPosition());
+            }
+
+            /*
             bool shouldBranch = false;
             if (currentWaypoint.branches != null && currentWaypoint.branches.Length > 0)
             {
@@ -89,6 +108,7 @@ public class WaypointNavigator : MonoBehaviour
                 controller.SetDestination(currentWaypoint.GetPosition());
 
             }
+            */
         }
     }
 

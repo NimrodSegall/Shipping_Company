@@ -45,7 +45,7 @@ namespace Pathfinding
             Waypoint wp = start;
             while(wp.graphNode == null)
             {
-                wp = wp.next;
+                wp = wp.nexts[0];
             }
             return wp.graphNode;
         }
@@ -114,13 +114,13 @@ namespace Pathfinding
         private List<Waypoint> GetPaths(Waypoint wp)
         {
             Waypoint current = wp;
-            while(current.allPrevs.Length < 1)
+            while(current.prevs.ToArray().Length < 1)
             {
-                current.prev.leadingTo = current;
-                current = current.prev;
+                current.prevs[0].leadingTo = current;
+                current = current.prevs[0];
             }
             List<Waypoint> paths = new List<Waypoint>();
-            paths.AddRange(current.allPrevs);
+            paths.AddRange(current.prevs);
 
             foreach(Waypoint path in paths.ToArray())
             {
@@ -128,8 +128,8 @@ namespace Pathfinding
                 if (path.isBranch)
                 {
                     paths.Remove(path);
-                    paths.AddRange(path.allPrevs);
-                    foreach(Waypoint newPath in path.allPrevs)
+                    paths.AddRange(path.prevs);
+                    foreach(Waypoint newPath in path.prevs)
                     {
                         newPath.leadingTo = path;
                     }

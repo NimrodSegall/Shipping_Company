@@ -146,19 +146,21 @@ public class RoadEditorWindow : EditorWindow
         Texture2D rightButton = arrowRightTexture;
         Texture2D downButton = arrowDownTexture;
         Texture2D leftButton = arrowLeftTexture;
-        if (Selection.activeGameObject?.GetComponent<IRoadInterface>() != null)
+        if (SelectedHasComponent<IRoadInterface>() || ParentHasComponent<IRoadInterface>())
         {
-            IRoadInterface currentRoad = Selection.activeGameObject?.GetComponent<IRoadInterface>();
+            IRoadInterface currentRoadInterface = GetCurrentComponent<IRoadInterface>();
+            RoadBase currentRoad = GetCurrentComponent<RoadBase>();
+
             string dir;
             bool isDisabled = false;
 
             GUILayout.BeginHorizontal();
             dir = "forward";
-            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if(Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+            if(currentRoad != null)
             {
-                if(Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                if(currentRoad.createDirection == dir)
                 {
                     upButton = arrowUpTexture_G; 
                 }
@@ -169,7 +171,7 @@ public class RoadEditorWindow : EditorWindow
             }
             if (GUILayout.Button(upButton))
             {
-                currentRoad.SetCreateDirection(dir);
+                currentRoadInterface.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -177,11 +179,11 @@ public class RoadEditorWindow : EditorWindow
 
             GUILayout.BeginHorizontal();
             dir = "left";
-            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+            if (currentRoad != null)
             {
-                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                if (currentRoad.createDirection == dir)
                 {
                     leftButton = arrowLeftTexture_G;
                 }
@@ -192,17 +194,17 @@ public class RoadEditorWindow : EditorWindow
             }
             if (GUILayout.Button(leftButton))
             {
-                currentRoad.SetCreateDirection(dir);
+                currentRoadInterface.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
 
             dir = "right";
-            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+            if (currentRoad != null)
             {
-                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                if (currentRoad.createDirection == dir)
                 {
                     rightButton = arrowRightTexture_G;
                 }
@@ -213,7 +215,7 @@ public class RoadEditorWindow : EditorWindow
             }
             if (GUILayout.Button(rightButton))
             {
-                currentRoad.SetCreateDirection(dir);
+                currentRoadInterface.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -221,11 +223,11 @@ public class RoadEditorWindow : EditorWindow
 
             GUILayout.BeginHorizontal();
             dir = "backward";
-            isDisabled = IsDirectionButtonDisabled(currentRoad, Selection.activeGameObject, dir);
+            isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
-            if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+            if (currentRoad != null)
             {
-                if (Selection.activeGameObject.GetComponent<RoadBase>().createDirection == dir)
+                if (currentRoad.createDirection == dir)
                 {
                     downButton = arrowDownTexture_G;
                 }
@@ -236,7 +238,7 @@ public class RoadEditorWindow : EditorWindow
             }
             if (GUILayout.Button(downButton))
             {
-                currentRoad.SetCreateDirection(dir);
+                currentRoadInterface.SetCreateDirection(dir);
                 currentOrientation = dir;
             }
             EditorGUI.EndDisabledGroup();
@@ -265,17 +267,17 @@ public class RoadEditorWindow : EditorWindow
         {
             if (GUILayout.Button("Delete Road"))
             {
-                DestroyImmediate(Selection.activeGameObject);
+                DestroyImmediate(GetCurrentComponent<RoadBase>().gameObject);
             }
         }
     }
 
     private void DrawRotationButtons()
     {
-        EditorGUI.BeginDisabledGroup(Selection.activeGameObject?.GetComponent<RoadT>() == null);
+        EditorGUI.BeginDisabledGroup(!GetCurrentComponent<RoadT>());
         if (GUILayout.Button(counterClockwiseText))
         {
-            RoadBase currentlySelectedRoad = Selection.activeGameObject.GetComponent<RoadBase>();
+            RoadBase currentlySelectedRoad = GetCurrentComponent<RoadBase>();
             string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 3);
             Vector3[] currentPos = { currentlySelectedRoad.transform.position };
             string currentName = currentlySelectedRoad.name;
@@ -285,7 +287,7 @@ public class RoadEditorWindow : EditorWindow
 
         if (GUILayout.Button(clockwiseText))
         {
-            RoadBase currentlySelectedRoad = Selection.activeGameObject.GetComponent<RoadBase>();
+            RoadBase currentlySelectedRoad = GetCurrentComponent<RoadBase>();
             string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 1);
             Vector3[] currentPos = { currentlySelectedRoad.transform.position };
             string currentName = currentlySelectedRoad.name;
@@ -336,9 +338,9 @@ public class RoadEditorWindow : EditorWindow
     private RoadBase GetPrevRoad()
     {
         RoadBase prevRoad = null;
-        if (Selection.activeGameObject?.GetComponent<RoadBase>() != null)
+        if (GetCurrentComponent<RoadBase>() != null)
         {
-            prevRoad = Selection.activeGameObject.GetComponent<RoadBase>();
+            prevRoad = GetCurrentComponent<RoadBase>();
         }
         else if (roadRoot.childCount > 1)
         {
@@ -514,10 +516,35 @@ public class RoadEditorWindow : EditorWindow
         }
     }
 
-    private bool IsDirectionButtonDisabled(IRoadInterface currentRoad, GameObject currentlySelected, string dir)
+    private bool IsDirectionButtonDisabled(IRoadInterface currentRoad, string dir)
     {
         return !(currentRoad.IsDirectionConnectable(dir));
-    //&& currentlySelected?.GetComponent<RoadBase>()?.createDirection != dir);
+    }
+
+    private bool SelectedHasComponent<T>() where T: class
+    {
+        return Selection.activeGameObject?.GetComponent<T>() != null;
+    }
+
+    private bool ParentHasComponent<T>() where T : class
+    {
+        return Selection.activeGameObject?.GetComponentInParent<T>() != null;
+    }
+
+    private T GetCurrentComponent<T>() where T: class 
+    {
+        if(SelectedHasComponent<T>())
+        {
+            return Selection.activeGameObject.GetComponent<T>();
+        }
+        else if(ParentHasComponent<T>())
+        {
+            return Selection.activeGameObject.GetComponentInParent<T>();
+        }
+        else
+        {
+            return null;
+        }
     }
 }
 
