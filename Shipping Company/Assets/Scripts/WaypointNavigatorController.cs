@@ -4,17 +4,19 @@ using UnityEngine;
 
 public class WaypointNavigatorController : MonoBehaviour
 {
-    public float speed = 10f;
+    [SerializeField]
+    public float baseSpeed = 10f;
     public float rotationSpeed = 10f;
 
     private float stopDistance = 2.5f;
 
     private Vector3 destination;
 
+    private float currentSpeed = 0f;
     // Start is called before the first frame update
     void Start()
     {
-
+        currentSpeed = baseSpeed;
     }
 
     // Update is called once per frame
@@ -26,7 +28,7 @@ public class WaypointNavigatorController : MonoBehaviour
     private void MoveTowardsTarget(Vector3 target)
     {
         RotateDirection(target);
-        transform.position += speed * transform.forward * Time.deltaTime;
+        transform.position += currentSpeed * transform.forward * Time.deltaTime;
     }
 
     public void SetDestination(Vector3 newDestination)
@@ -37,6 +39,18 @@ public class WaypointNavigatorController : MonoBehaviour
     public bool ReachedDestination()
     {
         return (destination - transform.position).magnitude < stopDistance;
+    }
+
+    public void ToggleStop(bool stop)
+    {
+        if(stop)
+        {
+            currentSpeed = 0f;
+        }
+        else
+        {
+            currentSpeed = baseSpeed;
+        }
     }
 
     private void RotateDirection(Vector3 target)

@@ -16,6 +16,8 @@ public class Waypoint : MonoBehaviour
 
     public Pathfinding.RoadNode graphNode = null;
 
+    public bool isLoadingSpot = false;
+
     public string placeName = "";
 
     private void Start()

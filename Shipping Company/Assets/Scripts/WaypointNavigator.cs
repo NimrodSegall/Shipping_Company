@@ -13,6 +13,9 @@ public class WaypointNavigator : MonoBehaviour
     private int pathPosition = 0;
     private bool isGuided = false;
 
+    private float loadingTime = 10f;
+    private float lastLoadingEventTime = 0f;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -32,10 +35,6 @@ public class WaypointNavigator : MonoBehaviour
             {
                 RandomMotion();
             }
-        }
-        else
-        {
-            Stop();
         }
 
     }
@@ -60,15 +59,15 @@ public class WaypointNavigator : MonoBehaviour
         targetWaypoint = null;
     }
 
-    public void Stop()
-    {
-        controller.SetDestination(transform.position);
-    }
-
     private void GuidedMotion()
     {
         if (controller.ReachedDestination())
         {
+            if (currentWaypoint.isLoadingSpot)
+            {
+                LoadCargo();
+            }
+
             currentWaypoint = path[pathPosition];
             pathPosition++;
             if (currentWaypoint == targetWaypoint || pathPosition > path.Count - 1)
@@ -86,29 +85,13 @@ public class WaypointNavigator : MonoBehaviour
             if (currentWaypoint?.nexts?.Count > 0)
             {
                 int choice = Random.Range(0, currentWaypoint.nexts.Count);
+                while(currentWaypoint.nexts[choice].isLoadingSpot)
+                {
+                    choice = (choice + 1) % currentWaypoint.nexts.Count;
+                }
                 currentWaypoint = currentWaypoint.nexts[choice];
                 controller.SetDestination(currentWaypoint.GetPosition());
             }
-
-            /*
-            bool shouldBranch = false;
-            if (currentWaypoint.branches != null && currentWaypoint.branches.Length > 0)
-            {
-                shouldBranch = Random.Range(0f, 1f) < currentWaypoint.branchRatio;
-            }
-
-            if (shouldBranch)
-            {
-                currentWaypoint = currentWaypoint.branches[Random.Range(0, currentWaypoint.branches.Length - 1)];
-            }
-
-            if (currentWaypoint.next != null)
-            {
-                currentWaypoint = currentWaypoint.next;
-                controller.SetDestination(currentWaypoint.GetPosition());
-
-            }
-            */
         }
     }
 
@@ -124,5 +107,17 @@ public class WaypointNavigator : MonoBehaviour
         controller = GetComponent<WaypointNavigatorController>();
         controller.SetDestination(wp.GetPosition());
         
+    }
+
+    private void LoadCargo()
+    {
+        if (Time.time > lastLoadingEventTime + loadingTime)
+        {
+            lastLoadingEventTime = Time.time;
+        }
+        else
+        {
+            controller.ToggleStop(true);
+        }
     }
 }
