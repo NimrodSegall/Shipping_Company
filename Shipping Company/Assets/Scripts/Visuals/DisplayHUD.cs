@@ -25,17 +25,8 @@ public class DisplayHUD : MonoBehaviour
 
     private void DisplayTime()
     {
-        timeTMP.SetText(FormatTime(time));
+        timeTMP.SetText(Utilities.FormatTime(time));
     }
 
-    private string FormatTime(int timeInt)
-    {
-        string time = "";
-        if((timeInt / 10) < 1)
-        {
-            time = time + "0";
-        }
-        time = time + timeInt + ":00";
-        return time;
-    }
+
 }

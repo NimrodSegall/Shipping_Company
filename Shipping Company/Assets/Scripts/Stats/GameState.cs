@@ -5,7 +5,7 @@ public class GameState : MonoBehaviour
     public static GameState current = null;
     public int time = 12;
 
-    public float secsPerHour = 5f;
+    public float secsPerHour = 60f;
 
     public Color[] sunColors = new Color[24];
 

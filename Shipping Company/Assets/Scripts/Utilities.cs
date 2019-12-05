@@ -58,4 +58,15 @@ public class Utilities : MonoBehaviour
         return false;
     }
 
+    public static string FormatTime(int timeInt)
+    {
+        string time = "";
+        if ((timeInt / 10) < 1)
+        {
+            time = time + "0";
+        }
+        time = time + timeInt + ":00";
+        return time;
+    }
+
 }

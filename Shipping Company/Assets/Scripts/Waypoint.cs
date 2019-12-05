@@ -3,8 +3,6 @@ using UnityEngine;
 
 public class Waypoint : MonoBehaviour
 {
-    //public Waypoint prev;
-    //public Waypoint next;
 
     public List<Waypoint> nexts = new List<Waypoint>();
     public List<Waypoint> prevs = new List<Waypoint>();
@@ -13,17 +11,12 @@ public class Waypoint : MonoBehaviour
 
     public bool isBranch = false;
 
-    //public Waypoint[] allPrevs;
-
     [HideInInspector]
     public float width = 0.5f;
 
-    //public List<Waypoint> branches;
-    //public Waypoint[] branches;
-    //[Range(0f, 1f)]
-    //public float branchRatio = 0.5f;
-
     public Pathfinding.RoadNode graphNode = null;
+
+    public string placeName = "";
 
     private void Start()
     {
@@ -35,9 +28,6 @@ public class Waypoint : MonoBehaviour
 
     public Vector3 GetPosition()
     {
-        //Vector3 minBound = transform.position + transform.right * width / 2;
-        //Vector3 maxBound = transform.position - transform.right * width / 2;
-        //return Vector3.Lerp(minBound, maxBound, Random.Range(0f, 1f));
         return transform.position;
     }
 
