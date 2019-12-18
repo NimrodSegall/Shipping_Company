@@ -15,6 +15,7 @@ public class Inputs : MonoBehaviour
 
     private KeyCode[] zoomInKeys = { KeyCode.Plus, KeyCode.R };
     private KeyCode[] zoomOutKeys = { KeyCode.Minus, KeyCode.F };
+    private KeyCode[] pauseKeys = { KeyCode.P };
 
     public bool up = false;
     public bool down = false;
@@ -26,6 +27,8 @@ public class Inputs : MonoBehaviour
 
     public bool zoomIn = false;
     public bool zoomOut = false;
+
+    public bool pauseGame = false;
 
     private void Awake()
     {
@@ -49,6 +52,11 @@ public class Inputs : MonoBehaviour
 
         zoomIn = IsKeyPressed(zoomInKeys);
         zoomOut = IsKeyPressed(zoomOutKeys);
+
+        if(IsKeyPressedThisFrame(pauseKeys))
+        {
+            pauseGame = !pauseGame;
+        }
     }
 
     private bool IsKeyPressed(KeyCode[] keysArr)
@@ -57,6 +65,16 @@ public class Inputs : MonoBehaviour
         foreach (KeyCode key in keysArr)
         {
             pressed = pressed || Input.GetKey(key);
+        }
+        return pressed;
+    }
+
+    private bool IsKeyPressedThisFrame(KeyCode[] keysArr)
+    {
+        bool pressed = false;
+        foreach (KeyCode key in keysArr)
+        {
+            pressed = pressed || Input.GetKeyDown(key);
         }
         return pressed;
     }

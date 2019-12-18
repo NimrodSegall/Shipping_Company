@@ -11,6 +11,8 @@ public class GameState : MonoBehaviour
 
     private float lastTimeTick = 0f;
 
+    private bool isPaused = false;
+
     private void Awake()
     {
         current = this;
@@ -24,6 +26,7 @@ public class GameState : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        CheckPause();
         UpdateTime();
     }
 
@@ -33,6 +36,18 @@ public class GameState : MonoBehaviour
         {
             time = (time + 1) % 24;
             lastTimeTick = Time.time;
+        }
+    }
+
+    private void CheckPause()
+    {
+        if(Inputs.get.pauseGame)
+        {
+            GameEvents.events.OnPauseGame();
+        }
+        else
+        {
+            GameEvents.events.OnUnpauseGame();
         }
     }
 }

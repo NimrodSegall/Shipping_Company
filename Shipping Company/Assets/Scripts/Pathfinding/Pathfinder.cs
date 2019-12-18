@@ -113,12 +113,8 @@ namespace Pathfinding
 
         private List<Waypoint> GetPaths(Waypoint wp)
         {
-            Waypoint current = wp;
-            while(current.prevs.ToArray().Length < 1)
-            {
-                current.prevs[0].leadingTo = current;
-                current = current.prevs[0];
-            }
+            Waypoint current = FindLastBranch(wp);
+
             List<Waypoint> paths = new List<Waypoint>();
             paths.AddRange(current.prevs);
 
@@ -137,6 +133,17 @@ namespace Pathfinding
             }
 
             return paths;
+        }
+
+        private Waypoint FindLastBranch(Waypoint wp)
+        {
+            Waypoint current = wp;
+            while (current.prevs.ToArray().Length < 2)
+            {
+                current.prevs[0].leadingTo = current;
+                current = current.prevs[0];
+            }
+            return current;
         }
 
         private bool GetStopCondition(RoadNode[] chckedList, RoadNode target)

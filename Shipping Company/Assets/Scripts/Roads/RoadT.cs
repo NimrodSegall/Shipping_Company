@@ -4,12 +4,12 @@ namespace RoadTypes
 {
     public class RoadT : RoadBase, IRoadInterface
     {
-        public void SetCreateDirection(string newDir)
+        public void SetCreateDirection(int newDir)
         {
             createDirection = newDir;
         }
         // Is the direction -transform.forward or transform.right or-transform.right?
-        public bool IsDirectionConnectable(string direction)
+        public bool IsDirectionConnectable(int direction)
         {
             Vector3 vecDir = DirToVec(direction);
             if (Utilities.IsAlmostOne(Vector3.Dot(vecDir, -transform.forward)) || Utilities.IsAlmostOne(Vector3.Dot(vecDir, transform.right))
@@ -24,31 +24,25 @@ namespace RoadTypes
         }
 
 
-        public void CreateRoad(RoadBase prevRoad, float gridSize, string newOrientation, Vector3[] newPosVec)
+        public void CreateRoad(RoadBase prevRoad, float gridSize, int newOrientation, Vector3[] newPosVec)
         {
             if (prevRoad != null)
             {
-                if (newPosVec == null)
-                {
-                    transform.position = prevRoad.transform.position + DirToVec(prevRoad.createDirection) * gridSize;
-                }
-                else
-                {
-                    transform.position = newPosVec[0];
-                }
-                if (newOrientation == null)
-                {
-                    
-                    createDirection = RotateRelativeTo("forward", prevRoad.createDirection);
-                    orientation = prevRoad.createDirection;
-                    transform.forward = DirToVec(prevRoad.createDirection);
-                }
-                else
-                {
-                    createDirection = RotateRelativeTo("forward", newOrientation);
-                    orientation = newOrientation;
-                    transform.forward = DirToVec(newOrientation);
-                }
+                transform.position = newPosVec[0];
+                createDirection = RotateRelativeTo((int)directions.right, newOrientation);
+                orientation = newOrientation;
+                transform.forward = DirToVec(newOrientation);
+            }
+        }
+
+        public void CreateRoad(RoadBase prevRoad, float gridSize)
+        {
+            if (prevRoad != null)
+            {
+                transform.position = prevRoad.transform.position + DirToVec(prevRoad.createDirection) * gridSize;
+                createDirection = RotateRelativeTo((int)directions.right, prevRoad.createDirection);
+                orientation = prevRoad.createDirection;
+                transform.forward = DirToVec(prevRoad.createDirection);
             }
         }
     }

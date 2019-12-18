@@ -46,27 +46,6 @@ public class WaypointVisualizer
             }
         }
 
-        /*
-        if (waypoint.prevs.Count > 0)
-        {
-            Gizmos.color = Color.red;
-            Vector3 offset = waypoint.transform.right * waypoint.width / 2f;
-            Vector3 offsetTo = waypoint.prev.transform.right * waypoint.prev.width / 2f;
-
-            Gizmos.DrawLine(waypoint.transform.position + offset, waypoint.prev.transform.position + offsetTo);
-        }
-        
-
-        if(waypoint.next != null)
-        {
-            Gizmos.color = Color.green;
-            Vector3 offset = -waypoint.transform.right * waypoint.width / 2f;
-            Vector3 offsetTo = -waypoint.next.transform.right * waypoint.next.width / 2f;
-
-            Gizmos.DrawLine(waypoint.transform.position + offset, waypoint.next.transform.position + offsetTo);
-        }
-        */
-
         if(waypoint.isBranch)
         {
             foreach(Waypoint branch in waypoint.nexts)

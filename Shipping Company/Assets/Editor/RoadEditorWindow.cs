@@ -18,6 +18,7 @@ public class RoadEditorWindow : EditorWindow
 
     private float gridSize = GameParameters.gridSize;
     private GameObject roadPrefab, roadPrefabCorner_R, roadPrefabCorner_L, roadPrefab_T, roadPrefab_X;
+    private GameObject buildingPrefab;
 
     private Texture2D roadButtonTexture, roadButtonRTexture, roadButtonLTexture, roadButtonTTexture, roadButtonXTexture;
     private Texture2D arrowUpTexture, arrowRightTexture, arrowDownTexture, arrowLeftTexture;
@@ -33,7 +34,7 @@ public class RoadEditorWindow : EditorWindow
     private int tab = 1;
     private bool selectAndBuild = true;
 
-    private string currentOrientation = "forward";
+    private int currentOrientation = 0;
 
     private void OnGUI()
     {
@@ -48,9 +49,9 @@ public class RoadEditorWindow : EditorWindow
                 EditorGUILayout.PropertyField(obj.FindProperty("dataPrefab"));
                 obj.ApplyModifiedProperties();
 
-                EditorGUILayout.BeginHorizontal("box");
+                EditorGUILayout.BeginVertical("box");
                 DrawEditorOption();
-                EditorGUILayout.EndHorizontal();
+                EditorGUILayout.EndVertical();
                 break;
 
             case 1:
@@ -98,7 +99,7 @@ public class RoadEditorWindow : EditorWindow
             currentRoadPrefab = roadPrefab;
             if(selectAndBuild)
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -107,7 +108,7 @@ public class RoadEditorWindow : EditorWindow
             currentRoadPrefab = roadPrefabCorner_R;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -116,7 +117,7 @@ public class RoadEditorWindow : EditorWindow
             currentRoadPrefab = roadPrefabCorner_L;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -125,7 +126,7 @@ public class RoadEditorWindow : EditorWindow
             currentRoadPrefab = roadPrefab_T;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -134,7 +135,7 @@ public class RoadEditorWindow : EditorWindow
             currentRoadPrefab = roadPrefab_X;
             if (selectAndBuild)
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -151,11 +152,11 @@ public class RoadEditorWindow : EditorWindow
             IRoadInterface currentRoadInterface = GetCurrentComponent<IRoadInterface>();
             RoadBase currentRoad = GetCurrentComponent<RoadBase>();
 
-            string dir;
+            int dir;
             bool isDisabled = false;
 
             GUILayout.BeginHorizontal();
-            dir = "forward";
+            dir = (int)RoadBase.directions.forward;
             isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
             if(currentRoad != null)
@@ -178,7 +179,7 @@ public class RoadEditorWindow : EditorWindow
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            dir = "left";
+            dir = (int)RoadBase.directions.left;
             isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
             if (currentRoad != null)
@@ -199,7 +200,7 @@ public class RoadEditorWindow : EditorWindow
             }
             EditorGUI.EndDisabledGroup();
 
-            dir = "right";
+            dir = (int)RoadBase.directions.right;
             isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
             if (currentRoad != null)
@@ -222,7 +223,7 @@ public class RoadEditorWindow : EditorWindow
             GUILayout.EndHorizontal();
 
             GUILayout.BeginHorizontal();
-            dir = "backward";
+            dir = (int)RoadBase.directions.backward;
             isDisabled = IsDirectionButtonDisabled(currentRoadInterface, dir);
             EditorGUI.BeginDisabledGroup(isDisabled);
             if (currentRoad != null)
@@ -248,7 +249,7 @@ public class RoadEditorWindow : EditorWindow
         {
             if (GUILayout.Button("Reset Direction"))
             {
-                currentOrientation = "forward";
+                currentOrientation = (int)RoadBase.directions.forward;
             }
         }
     }
@@ -259,7 +260,7 @@ public class RoadEditorWindow : EditorWindow
         {
             if (GUILayout.Button("Create Road"))
             {
-                NewRoadButtonCallback(currentRoadPrefab, null, null, null);
+                NewRoadButtonCallback(currentRoadPrefab);
             }
         }
 
@@ -278,7 +279,7 @@ public class RoadEditorWindow : EditorWindow
         if (GUILayout.Button(counterClockwiseText))
         {
             RoadBase currentlySelectedRoad = GetCurrentComponent<RoadBase>();
-            string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 3);
+            int newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 3);
             Vector3[] currentPos = { currentlySelectedRoad.transform.position };
             string currentName = currentlySelectedRoad.name;
             DestroyImmediate(currentlySelectedRoad.gameObject);
@@ -288,7 +289,7 @@ public class RoadEditorWindow : EditorWindow
         if (GUILayout.Button(clockwiseText))
         {
             RoadBase currentlySelectedRoad = GetCurrentComponent<RoadBase>();
-            string newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 1);
+            int newRotation = RoadBase.RotateClockwise(currentlySelectedRoad.orientation, 1);
             Vector3[] currentPos = { currentlySelectedRoad.transform.position };
             string currentName = currentlySelectedRoad.name;
             DestroyImmediate(currentlySelectedRoad.gameObject);
@@ -298,7 +299,7 @@ public class RoadEditorWindow : EditorWindow
     }
 
     // Using Vector3[] array since Vector3 is not nullable
-    private void NewRoadButtonCallback(GameObject currentRoadPrefab, string newOrientation, Vector3[] newPosVec, string newName)
+    private void NewRoadButtonCallback(GameObject currentRoadPrefab, int newOrientation, Vector3[] newPosVec, string newName)
     {
         RoadBase currentRoad = NewRoad(currentRoadPrefab, newOrientation, newPosVec, newName);
         RaycastHit[] nearbyRoadHits = FindNearbyRoads(currentRoad);
@@ -314,8 +315,26 @@ public class RoadEditorWindow : EditorWindow
         }
         currentOrientation = currentRoad.createDirection;
     }
-    
-    private RoadBase NewRoad(GameObject roadPrefab, string newOrientation, Vector3[] newPositionTransform, string newName)
+
+    // Using Vector3[] array since Vector3 is not nullable
+    private void NewRoadButtonCallback(GameObject currentRoadPrefab)
+    {
+        RoadBase currentRoad = NewRoad(currentRoadPrefab);
+        RaycastHit[] nearbyRoadHits = FindNearbyRoads(currentRoad);
+        for (int i = 0; i < nearbyRoadHits.Length; i++)
+        {
+            if (nearbyRoadHits[i].collider?.GetComponent<RoadBase>() != null)
+            {
+                Waypoint[] thisObjectWaypoint = FindWaypointsInRoadClosestToPoint(currentRoad, nearbyRoadHits[i].point);
+                Waypoint[] otherObjectWaypoints = FindWaypointsInRoadClosestToPoint(nearbyRoadHits[i].collider.GetComponent<RoadBase>(), nearbyRoadHits[i].point);
+                Waypoint[][] orderedForConnection = OrderWaypointsForConnection(thisObjectWaypoint, otherObjectWaypoints);
+                RoadBase.ConnectRoads(orderedForConnection);
+            }
+        }
+        currentOrientation = currentRoad.createDirection;
+    }
+
+    private RoadBase NewRoad(GameObject roadPrefab, int newOrientation, Vector3[] newPositionTransform, string newName)
     {
         GameObject roadObject = Instantiate(roadPrefab, roadRoot);
         if (newName == null)
@@ -331,6 +350,21 @@ public class RoadEditorWindow : EditorWindow
         {
             roadObject.GetComponent<IRoadInterface>().CreateRoad(prevRoad, gridSize, newOrientation, newPositionTransform);
         }
+
+        Selection.activeGameObject = roadObject;
+        return roadObject.GetComponent<RoadBase>();
+    }
+
+    private RoadBase NewRoad(GameObject roadPrefab)
+    {
+        GameObject roadObject = Instantiate(roadPrefab, roadRoot);
+        roadObject.name = "Road " + roadRoot.childCount;
+        RoadBase prevRoad = GetPrevRoad();
+        if (prevRoad != null)
+        {
+            roadObject.GetComponent<IRoadInterface>().CreateRoad(prevRoad, gridSize);
+        }
+
         Selection.activeGameObject = roadObject;
         return roadObject.GetComponent<RoadBase>();
     }
@@ -351,10 +385,10 @@ public class RoadEditorWindow : EditorWindow
 
     private RaycastHit[] FindNearbyRoads(RoadBase currentRoad)
     {
-        RaycastHit[] objectHits = new RaycastHit[RoadBase.directions.Length];
-        for (int i = 0; i < RoadBase.directions.Length; i++)
+        RaycastHit[] objectHits = new RaycastHit[RoadBase.directionsLength];
+        for (int i = 0; i < RoadBase.directionsLength; i++)
         {
-            string dir = RoadBase.directions[i];
+            int dir = RoadBase.DirToInd(RoadBase.dirStrings[i]);
             // If can connect towards dir
             if (currentRoad.GetComponent<IRoadInterface>().IsDirectionConnectable(dir))
             {
@@ -495,6 +529,8 @@ public class RoadEditorWindow : EditorWindow
             roadPrefab_T = data.prefabs[3];
             roadPrefab_X = data.prefabs[4];
 
+            buildingPrefab = data.prefabs[5];
+
             roadButtonTexture = data.textures[0];
             roadButtonRTexture = data.textures[1];
             roadButtonLTexture = data.textures[2];
@@ -516,7 +552,7 @@ public class RoadEditorWindow : EditorWindow
         }
     }
 
-    private bool IsDirectionButtonDisabled(IRoadInterface currentRoad, string dir)
+    private bool IsDirectionButtonDisabled(IRoadInterface currentRoad, int dir)
     {
         return !(currentRoad.IsDirectionConnectable(dir));
     }

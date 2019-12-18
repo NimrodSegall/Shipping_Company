@@ -16,6 +16,8 @@ public class WaypointNavigatorController : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        GameEvents.events.onPauseGame += OnPauseGame;
+        GameEvents.events.onUnpauseGame += OnUnpauseGame;
         currentSpeed = baseSpeed;
     }
 
@@ -57,5 +59,15 @@ public class WaypointNavigatorController : MonoBehaviour
     {
         Quaternion targetRotation = Quaternion.LookRotation(target - transform.position);
         transform.rotation = Quaternion.RotateTowards(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+    }
+
+    private void OnPauseGame()
+    {
+        currentSpeed = 0f;
+    }
+
+    private void OnUnpauseGame()
+    {
+        currentSpeed = baseSpeed;
     }
 }
