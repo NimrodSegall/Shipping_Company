@@ -69,4 +69,21 @@ public class Utilities : MonoBehaviour
         return time;
     }
 
+    public static Collider FindNearestCollider(Vector3 center, float maxDist, int layerMask)
+    {
+        Collider[] colliders = Physics.OverlapSphere(center, maxDist, layerMask, QueryTriggerInteraction.Collide);
+        float minDist = Mathf.Infinity;
+        Collider nearestCol = null;
+        foreach (Collider collider in colliders)
+        {
+            float dist = (collider.transform.position - center).magnitude;
+            if (dist < minDist)
+            {
+                nearestCol = collider;
+                minDist = dist;
+            }
+        }
+        return nearestCol;
+    }
+
 }

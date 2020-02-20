@@ -1,5 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 public class WaypointNavigator : MonoBehaviour
@@ -16,10 +15,16 @@ public class WaypointNavigator : MonoBehaviour
     private float loadingTime = 10f;
     private float lastLoadingEventTime = 0f;
 
+    private readonly int roadsLayer = 1 << 10;
     // Start is called before the first frame update
     void Start()
     {
         controller = GetComponent<WaypointNavigatorController>();
+        if (currentWaypoint == null)
+        {
+            currentWaypoint = FindNearestWp();
+            isGuided = false;
+        }
     }
 
     // Update is called once per frame
@@ -119,5 +124,12 @@ public class WaypointNavigator : MonoBehaviour
         {
             controller.ToggleStop(true);
         }
+    }
+
+    private Waypoint FindNearestWp()
+    {
+        Collider nearestCol = Utilities.FindNearestCollider(transform.position, 2f, roadsLayer);
+        Waypoint nearestWp = nearestCol.GetComponent<RoadTypes.RoadBase>().lanes[0]?.GetComponent<Waypoint>();
+        return nearestWp;
     }
 }
